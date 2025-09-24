@@ -25,7 +25,7 @@ import 'screens/otp_verification_screen.dart';
 import 'screens/seed_backup_screen.dart';
 import 'screens/login_screen.dart';
 import 'screens/recovery_screen.dart';
-import 'screens/reset_pin_screen.dart';
+import 'screens/auth_screen.dart';
 
 // Import theme
 import 'theme/app_theme.dart';
@@ -71,7 +71,7 @@ class MyApp extends StatelessWidget {
           '/seed-backup': (context) => const SeedBackupScreen(),
           '/login': (context) => const LoginScreen(),
           '/recovery': (context) => const RecoveryScreen(),
-          '/reset-pin': (context) => const ResetPinScreen(),
+          '/welcome': (context) => const AuthScreen(),
           
           // Drawer routes
           '/account': (context) => const AccountScreen(),

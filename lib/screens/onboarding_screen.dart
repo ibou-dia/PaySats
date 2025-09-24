@@ -58,14 +58,14 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
         curve: Curves.easeInOut,
       );
     } else {
-      // Navigate to registration instead of home
-      Navigator.pushReplacementNamed(context, '/registration');
+      // Navigate to auth screen after onboarding
+      Navigator.pushReplacementNamed(context, '/auth');
     }
   }
 
   void _skipOnboarding() {
-    // Navigate to registration instead of home
-    Navigator.pushReplacementNamed(context, '/registration');
+    // Navigate to auth screen
+    Navigator.pushReplacementNamed(context, '/auth');
   }
 
   @override

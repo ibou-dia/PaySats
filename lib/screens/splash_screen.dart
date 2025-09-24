@@ -41,9 +41,9 @@ class _SplashScreenState extends State<SplashScreen> with SingleTickerProviderSt
     
     _animationController.forward();
     
-    // Navigate to auth screen after delay
+    // Navigate to onboarding screen after delay
     Timer(const Duration(seconds: 2), () {
-      Navigator.pushReplacementNamed(context, Constants.routeAuth);
+      Navigator.pushReplacementNamed(context, Constants.routeOnboarding);
     });
   }
 

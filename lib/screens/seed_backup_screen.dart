@@ -49,14 +49,10 @@ class _SeedBackupScreenState extends State<SeedBackupScreen> {
     try {
       final authService = Provider.of<AuthService>(context, listen: false);
       
-      // Marquer la seed phrase comme sauvegardée et finaliser l'inscription
+      // Marquer la seed phrase comme sauvegardée
       await authService.markSeedPhraseAsBackedUp();
       
-      // Finaliser l'inscription avec un ID utilisateur généré
-      final userId = DateTime.now().millisecondsSinceEpoch.toString();
-      await authService.completeRegistration(userId);
-      
-      // Marquer l'utilisateur comme authentifié directement
+      // Authentifier directement l'utilisateur
       await authService.authenticateDirectly();
 
       if (mounted) {

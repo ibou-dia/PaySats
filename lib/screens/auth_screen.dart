@@ -63,48 +63,70 @@ class AuthScreen extends StatelessWidget {
                     
                     SizedBox(height: size.height * 0.08),
                     
-                    // Connect wallet button
+                    // Create wallet button
                     SizedBox(
                       width: double.infinity,
                       child: ElevatedButton(
                         onPressed: walletService.isLoading
                             ? null
+                            : () {
+                                Navigator.pushReplacementNamed(context, '/registration');
+                              },
+                        style: ElevatedButton.styleFrom(
+                          backgroundColor: AppTheme.bitcoinOrange,
+                          foregroundColor: Colors.white,
+                          padding: const EdgeInsets.symmetric(vertical: 16),
+                          shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(12),
+                          ),
+                        ),
+                        child: const Text(
+                          'Créer wallet',
+                          style: TextStyle(
+                            fontSize: 16,
+                            fontWeight: FontWeight.w600,
+                          ),
+                        ),
+                      ),
+                    ),
+                    const SizedBox(height: 16),
+                    
+                    // Connect wallet button
+                    SizedBox(
+                      width: double.infinity,
+                      child: OutlinedButton(
+                        onPressed: walletService.isLoading
+                            ? null
                             : () async {
                                 final success = await walletService.connectWallet();
                                 if (success && context.mounted) {
-                                  // Rediriger vers l'onboarding au lieu de l'écran d'accueil
-                                  Navigator.pushReplacementNamed(context, '/onboarding');
+                                  Navigator.pushReplacementNamed(context, '/home');
                                 }
                               },
+                        style: OutlinedButton.styleFrom(
+                          foregroundColor: AppTheme.bitcoinOrange,
+                          side: const BorderSide(color: AppTheme.bitcoinOrange),
+                          padding: const EdgeInsets.symmetric(vertical: 16),
+                          shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(12),
+                          ),
+                        ),
                         child: walletService.isLoading
                             ? const SizedBox(
                                 height: 20,
                                 width: 20,
                                 child: CircularProgressIndicator(
-                                  color: Colors.white,
+                                  color: AppTheme.bitcoinOrange,
                                   strokeWidth: 2,
                                 ),
                               )
-                            : const Text('Connect Wallet'),
-                      ),
-                    ),
-                    const SizedBox(height: 16),
-                    
-                    // Create wallet link
-                    TextButton(
-                      onPressed: walletService.isLoading
-                          ? null
-                          : () async {
-                              final success = await walletService.createWallet();
-                              if (success && context.mounted) {
-                                Navigator.pushReplacementNamed(context, '/onboarding');
-                              }
-                            },
-                      child: Text(
-                        "Don't have a wallet? Create one",
-                        style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-                              color: AppTheme.bitcoinOrange,
-                            ),
+                            : const Text(
+                                'Se connecter',
+                                style: TextStyle(
+                                  fontSize: 16,
+                                  fontWeight: FontWeight.w600,
+                                ),
+                              ),
                       ),
                     ),
                     
