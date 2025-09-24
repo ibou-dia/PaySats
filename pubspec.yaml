@@ -54,6 +54,9 @@ dependencies:
   shared_preferences: ^2.2.2
   # Removed flutter_secure_storage to avoid Android SDK platform issues
   
+  # Phone number input with country picker
+  intl_phone_field: ^3.2.0
+  
   # Charts for portfolio visualization
   fl_chart: ^0.66.2
   

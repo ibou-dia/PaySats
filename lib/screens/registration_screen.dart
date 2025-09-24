@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:provider/provider.dart';
+import 'package:intl_phone_field/intl_phone_field.dart';
 import '../services/auth_service.dart';
 import '../services/otp_service.dart';
 import '../theme/app_theme.dart';
@@ -22,6 +23,7 @@ class _RegistrationScreenState extends State<RegistrationScreen> {
   bool _isLoading = false;
   bool _acceptedTerms = false;
   String? _errorMessage;
+  String _completePhoneNumber = '';
 
   @override
   void dispose() {
@@ -52,7 +54,7 @@ class _RegistrationScreenState extends State<RegistrationScreen> {
 
       // Étape 1: Démarrer le processus d'inscription
       final registrationToken = await authService.startRegistration(
-        _phoneController.text.trim(),
+        _completePhoneNumber,
       );
 
       // Étape 2: Générer le wallet Bitcoin
@@ -60,7 +62,7 @@ class _RegistrationScreenState extends State<RegistrationScreen> {
 
       // Étape 3: Envoyer l'OTP pour vérification
       final otpSent = await otpService.sendOtp(
-        _phoneController.text.trim(),
+        _completePhoneNumber,
         OtpType.registration,
       );
 
@@ -70,7 +72,7 @@ class _RegistrationScreenState extends State<RegistrationScreen> {
           context,
           '/otp-verification',
           arguments: {
-            'phoneNumber': _phoneController.text.trim(),
+            'phoneNumber': _completePhoneNumber,
             'firstName': _firstNameController.text.trim(),
             'lastName': _lastNameController.text.trim(),
             'type': OtpType.registration,
@@ -94,25 +96,6 @@ class _RegistrationScreenState extends State<RegistrationScreen> {
         });
       }
     }
-  }
-
-  String? _validatePhoneNumber(String? value) {
-    if (value == null || value.isEmpty) {
-      return 'Veuillez entrer votre numéro de téléphone';
-    }
-    
-    // Supprimer les espaces et caractères spéciaux
-    final cleanNumber = value.replaceAll(RegExp(r'[^\d+]'), '');
-    
-    if (cleanNumber.length < 8) {
-      return 'Numéro de téléphone trop court';
-    }
-    
-    if (!cleanNumber.startsWith('+') && !cleanNumber.startsWith('0')) {
-      return 'Format invalide (ex: +33612345678 ou 0612345678)';
-    }
-    
-    return null;
   }
 
   String? _validateName(String? value) {
@@ -226,18 +209,25 @@ class _RegistrationScreenState extends State<RegistrationScreen> {
                     
                     const SizedBox(height: 16),
                     
-                    TextFormField(
+                    IntlPhoneField(
                       controller: _phoneController,
                       decoration: const InputDecoration(
                         labelText: 'Numéro de téléphone',
-                        prefixIcon: Icon(Icons.phone_outlined),
-                        hintText: '+33612345678 ou 0612345678',
+                        border: OutlineInputBorder(),
                       ),
-                      keyboardType: TextInputType.phone,
-                      validator: _validatePhoneNumber,
-                      inputFormatters: [
-                        FilteringTextInputFormatter.allow(RegExp(r'[\d+\s\-\(\)]')),
-                      ],
+                      initialCountryCode: 'SN', // Sénégal par défaut
+                      onChanged: (phone) {
+                        _completePhoneNumber = phone.completeNumber;
+                      },
+                      validator: (phone) {
+                        if (phone == null || phone.number.isEmpty) {
+                          return 'Veuillez entrer votre numéro de téléphone';
+                        }
+                        if (phone.number.length < 7) {
+                          return 'Numéro de téléphone trop court';
+                        }
+                        return null;
+                      },
                     ),
                     
                     const SizedBox(height: 24),

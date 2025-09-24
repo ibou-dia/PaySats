@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:provider/provider.dart';
+import 'package:intl_phone_field/intl_phone_field.dart';
 import '../services/auth_service.dart';
 import '../services/otp_service.dart';
 import '../models/auth_state.dart';
@@ -34,6 +35,7 @@ class _RecoveryScreenState extends State<RecoveryScreen>
   bool _isOtpSent = false;
   bool _isOtpVerified = false;
   int _resendCountdown = 0;
+  String _completePhoneNumber = '';
 
   @override
   void initState() {
@@ -93,7 +95,7 @@ class _RecoveryScreenState extends State<RecoveryScreen>
   }
 
   Future<void> _sendRecoveryOtp() async {
-    final phoneNumber = _phoneController.text.trim();
+    final phoneNumber = _completePhoneNumber.isNotEmpty ? _completePhoneNumber : _phoneController.text.trim();
     
     if (phoneNumber.isEmpty) {
       setState(() {
@@ -158,8 +160,10 @@ class _RecoveryScreenState extends State<RecoveryScreen>
     try {
       final otpService = Provider.of<OtpService>(context, listen: false);
       
+      final phoneNumber = _completePhoneNumber.isNotEmpty ? _completePhoneNumber : _phoneController.text.trim();
+      
       final isValid = await otpService.verifyOtp(
-        _phoneController.text.trim(),
+        phoneNumber,
         _currentOtp,
       );
 
@@ -171,7 +175,7 @@ class _RecoveryScreenState extends State<RecoveryScreen>
 
         // Démarrer le processus de récupération
         final authService = Provider.of<AuthService>(context, listen: false);
-        await authService.startAccountRecovery(_phoneController.text.trim());
+        await authService.startAccountRecovery(phoneNumber);
 
         // Naviguer vers l'écran de nouveau PIN
         if (mounted) {
@@ -179,7 +183,7 @@ class _RecoveryScreenState extends State<RecoveryScreen>
             context,
             '/reset-pin',
             arguments: {
-              'phoneNumber': _phoneController.text.trim(),
+              'phoneNumber': phoneNumber,
             },
           );
         }
@@ -218,7 +222,8 @@ class _RecoveryScreenState extends State<RecoveryScreen>
 
     try {
       final otpService = Provider.of<OtpService>(context, listen: false);
-      await otpService.resendOtp(_phoneController.text.trim());
+      final phoneNumber = _completePhoneNumber.isNotEmpty ? _completePhoneNumber : _phoneController.text.trim();
+      await otpService.resendOtp(phoneNumber);
       
       setState(() {
         _successMessage = 'Nouveau code envoyé';
@@ -287,13 +292,10 @@ class _RecoveryScreenState extends State<RecoveryScreen>
           ),
         ),
         const SizedBox(height: 8),
-        TextFormField(
+        IntlPhoneField(
           controller: _phoneController,
-          keyboardType: TextInputType.phone,
           enabled: !_isOtpSent,
           decoration: InputDecoration(
-            hintText: '+33 6 12 34 56 78',
-            prefixIcon: const Icon(Icons.phone),
             border: OutlineInputBorder(
               borderRadius: BorderRadius.circular(12),
             ),
@@ -305,9 +307,19 @@ class _RecoveryScreenState extends State<RecoveryScreen>
               ),
             ),
           ),
-          inputFormatters: [
-            FilteringTextInputFormatter.allow(RegExp(r'[0-9+\s-]')),
-          ],
+          initialCountryCode: 'SN', // Sénégal par défaut
+          onChanged: (phone) {
+            _completePhoneNumber = phone.completeNumber;
+          },
+          validator: (phone) {
+            if (phone == null || phone.number.isEmpty) {
+              return 'Veuillez entrer votre numéro de téléphone';
+            }
+            if (phone.number.length < 7) {
+              return 'Numéro de téléphone trop court';
+            }
+            return null;
+          },
         ),
       ],
     );
