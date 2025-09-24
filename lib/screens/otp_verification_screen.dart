@@ -15,13 +15,10 @@ class OtpVerificationScreen extends StatefulWidget {
 
 class _OtpVerificationScreenState extends State<OtpVerificationScreen> {
   final List<TextEditingController> _controllers = List.generate(
-    6,
+    4,
     (index) => TextEditingController(),
   );
-  final List<FocusNode> _focusNodes = List.generate(
-    6,
-    (index) => FocusNode(),
-  );
+  final List<FocusNode> _focusNodes = List.generate(4, (index) => FocusNode());
 
   bool _isLoading = false;
   String? _errorMessage;
@@ -57,7 +54,8 @@ class _OtpVerificationScreenState extends State<OtpVerificationScreen> {
   }
 
   void _loadArguments() {
-    final args = ModalRoute.of(context)?.settings.arguments as Map<String, dynamic>?;
+    final args =
+        ModalRoute.of(context)?.settings.arguments as Map<String, dynamic>?;
     if (args != null) {
       _phoneNumber = args['phoneNumber'] as String?;
       _firstName = args['firstName'] as String?;
@@ -72,13 +70,13 @@ class _OtpVerificationScreenState extends State<OtpVerificationScreen> {
     final otpService = Provider.of<OtpService>(context, listen: false);
     if (_phoneNumber != null) {
       _resendCountdown = otpService.getResendTimeRemaining(_phoneNumber!);
-      
+
       if (_resendCountdown > 0) {
         _resendTimer = Timer.periodic(const Duration(seconds: 1), (timer) {
           setState(() {
             _resendCountdown--;
           });
-          
+
           if (_resendCountdown <= 0) {
             timer.cancel();
           }
@@ -92,14 +90,14 @@ class _OtpVerificationScreenState extends State<OtpVerificationScreen> {
   }
 
   void _onDigitChanged(int index, String value) {
-    if (value.isNotEmpty && index < 5) {
+    if (value.isNotEmpty && index < 3) {
       _focusNodes[index + 1].requestFocus();
     } else if (value.isEmpty && index > 0) {
       _focusNodes[index - 1].requestFocus();
     }
 
     // Auto-verify when all digits are entered
-    if (_otpCode.length == 6) {
+    if (_otpCode.length == 4) {
       _verifyOtp();
     }
 
@@ -112,9 +110,9 @@ class _OtpVerificationScreenState extends State<OtpVerificationScreen> {
   }
 
   Future<void> _verifyOtp() async {
-    if (_otpCode.length != 6 || _phoneNumber == null) {
+    if (_otpCode.length != 4 || _phoneNumber == null) {
       setState(() {
-        _errorMessage = 'Veuillez entrer le code à 6 chiffres';
+        _errorMessage = 'Veuillez entrer le code à 4 chiffres';
       });
       return;
     }
@@ -138,7 +136,10 @@ class _OtpVerificationScreenState extends State<OtpVerificationScreen> {
           await authService.completeRegistration(userId);
 
           if (mounted) {
-            Navigator.pushReplacementNamed(context, _nextRoute ?? '/seed-backup');
+            Navigator.pushReplacementNamed(
+              context,
+              _nextRoute ?? '/seed-backup',
+            );
           }
         } else if (_otpType == OtpType.recovery) {
           // Récupération de compte - aller à la réinitialisation du PIN
@@ -224,10 +225,11 @@ class _OtpVerificationScreenState extends State<OtpVerificationScreen> {
   }
 
   String _getDescription() {
-    final maskedPhone = _phoneNumber != null 
-        ? '${_phoneNumber!.substring(0, 3)}***${_phoneNumber!.substring(_phoneNumber!.length - 2)}'
-        : '';
-    
+    final maskedPhone =
+        _phoneNumber != null
+            ? '${_phoneNumber!.substring(0, 3)}***${_phoneNumber!.substring(_phoneNumber!.length - 2)}'
+            : '';
+
     switch (_otpType) {
       case OtpType.registration:
         return 'Entrez le code de vérification envoyé au $maskedPhone pour finaliser votre inscription';
@@ -262,7 +264,7 @@ class _OtpVerificationScreenState extends State<OtpVerificationScreen> {
               ),
             ),
           ),
-          
+
           // Content
           SafeArea(
             child: SingleChildScrollView(
@@ -291,9 +293,9 @@ class _OtpVerificationScreenState extends State<OtpVerificationScreen> {
                       const SizedBox(width: 48), // Balance the back button
                     ],
                   ),
-                  
+
                   SizedBox(height: size.height * 0.06),
-                  
+
                   // Icon and description
                   Center(
                     child: Column(
@@ -302,7 +304,9 @@ class _OtpVerificationScreenState extends State<OtpVerificationScreen> {
                           width: 80,
                           height: 80,
                           decoration: BoxDecoration(
-                            color: AppTheme.bitcoinOrange.withValues(alpha: 0.1),
+                            color: AppTheme.bitcoinOrange.withValues(
+                              alpha: 0.1,
+                            ),
                             borderRadius: BorderRadius.circular(40),
                           ),
                           child: Icon(
@@ -323,15 +327,15 @@ class _OtpVerificationScreenState extends State<OtpVerificationScreen> {
                       ],
                     ),
                   ),
-                  
+
                   SizedBox(height: size.height * 0.06),
-                  
+
                   // OTP Input Fields
                   Row(
                     mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                    children: List.generate(6, (index) {
+                    children: List.generate(4, (index) {
                       return SizedBox(
-                        width: 45,
+                        width: 55,
                         height: 55,
                         child: TextFormField(
                           controller: _controllers[index],
@@ -340,7 +344,7 @@ class _OtpVerificationScreenState extends State<OtpVerificationScreen> {
                           keyboardType: TextInputType.number,
                           maxLength: 1,
                           style: const TextStyle(
-                            fontSize: 24,
+                            fontSize: 20,
                             fontWeight: FontWeight.bold,
                           ),
                           decoration: InputDecoration(
@@ -374,9 +378,9 @@ class _OtpVerificationScreenState extends State<OtpVerificationScreen> {
                       );
                     }),
                   ),
-                  
+
                   const SizedBox(height: 32),
-                  
+
                   // Error message
                   if (_errorMessage != null)
                     Container(
@@ -400,36 +404,38 @@ class _OtpVerificationScreenState extends State<OtpVerificationScreen> {
                         ],
                       ),
                     ),
-                  
+
                   // Verify button
                   SizedBox(
                     width: double.infinity,
                     child: ElevatedButton(
-                      onPressed: _isLoading || _otpCode.length != 6 ? null : _verifyOtp,
-                      child: _isLoading
-                          ? const SizedBox(
-                              height: 20,
-                              width: 20,
-                              child: CircularProgressIndicator(
-                                color: Colors.white,
-                                strokeWidth: 2,
-                              ),
-                            )
-                          : const Text('Vérifier'),
+                      onPressed:
+                          _isLoading || _otpCode.length != 4
+                              ? null
+                              : _verifyOtp,
+                      child:
+                          _isLoading
+                              ? const SizedBox(
+                                height: 20,
+                                width: 20,
+                                child: CircularProgressIndicator(
+                                  color: Colors.white,
+                                  strokeWidth: 2,
+                                ),
+                              )
+                              : const Text('Vérifier'),
                     ),
                   ),
-                  
+
                   const SizedBox(height: 24),
-                  
+
                   // Resend code
                   Center(
                     child: Column(
                       children: [
                         const Text(
                           'Vous n\'avez pas reçu le code ?',
-                          style: TextStyle(
-                            color: AppTheme.textSecondary,
-                          ),
+                          style: TextStyle(color: AppTheme.textSecondary),
                         ),
                         const SizedBox(height: 8),
                         TextButton(
@@ -439,16 +445,17 @@ class _OtpVerificationScreenState extends State<OtpVerificationScreen> {
                                 ? 'Renvoyer dans ${_resendCountdown}s'
                                 : 'Renvoyer le code',
                             style: TextStyle(
-                              color: _resendCountdown > 0
-                                  ? AppTheme.textSecondary
-                                  : AppTheme.bitcoinOrange,
+                              color:
+                                  _resendCountdown > 0
+                                      ? AppTheme.textSecondary
+                                      : AppTheme.bitcoinOrange,
                             ),
                           ),
                         ),
                       ],
                     ),
                   ),
-                  
+
                   SizedBox(height: size.height * 0.04),
                 ],
               ),

@@ -189,7 +189,7 @@ class OtpService extends ChangeNotifier {
 
   String _generateOtpCode() {
     final random = Random.secure();
-    final code = random.nextInt(900000) + 100000; // 6 chiffres
+    final code = random.nextInt(9000) + 1000; // 4 chiffres
     return code.toString();
   }
 

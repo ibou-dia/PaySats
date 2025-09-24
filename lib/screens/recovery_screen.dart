@@ -18,11 +18,11 @@ class _RecoveryScreenState extends State<RecoveryScreen>
     with TickerProviderStateMixin {
   final _phoneController = TextEditingController();
   final List<TextEditingController> _otpControllers = List.generate(
-    6,
+    4,
     (index) => TextEditingController(),
   );
   final List<FocusNode> _otpFocusNodes = List.generate(
-    6,
+    4,
     (index) => FocusNode(),
   );
 
@@ -75,14 +75,14 @@ class _RecoveryScreenState extends State<RecoveryScreen>
   }
 
   void _onOtpDigitChanged(int index, String value) {
-    if (value.isNotEmpty && index < 5) {
+    if (value.isNotEmpty && index < 3) {
       _otpFocusNodes[index + 1].requestFocus();
     } else if (value.isEmpty && index > 0) {
       _otpFocusNodes[index - 1].requestFocus();
     }
 
     // Auto-verify when OTP is complete
-    if (_currentOtp.length == 6) {
+    if (_currentOtp.length == 4) {
       _verifyOtp();
     }
 
@@ -145,9 +145,9 @@ class _RecoveryScreenState extends State<RecoveryScreen>
   }
 
   Future<void> _verifyOtp() async {
-    if (_currentOtp.length != 6) {
+    if (_currentOtp.length != 4) {
       setState(() {
-        _errorMessage = 'Veuillez entrer le code à 6 chiffres';
+        _errorMessage = 'Veuillez entrer le code à 4 chiffres';
       });
       return;
     }
@@ -340,7 +340,7 @@ class _RecoveryScreenState extends State<RecoveryScreen>
         const SizedBox(height: 8),
         Row(
           mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-          children: List.generate(6, (index) {
+          children: List.generate(4, (index) {
             return SizedBox(
               width: 45,
               height: 55,
