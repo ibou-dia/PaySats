@@ -88,6 +88,27 @@ class AuthService extends ChangeNotifier {
     }
   }
 
+  /// Marque la seed phrase comme sauvegardée sans vérification
+  Future<void> markSeedPhraseAsBackedUp() async {
+    if (_seedPhrase == null) {
+      throw Exception('Aucune seed phrase générée');
+    }
+
+    _seedPhrase = _seedPhrase!.copyWith(
+      isVerified: true,
+      isBackedUp: true,
+    );
+
+    _authState = _authState.copyWith(
+      isSeedPhraseBackedUp: true,
+      status: AuthStatus.pendingPinSetup,
+    );
+
+    await _saveSeedPhrase(_seedPhrase!);
+    await _saveAuthState();
+    notifyListeners();
+  }
+
   /// Vérifie la sauvegarde de la seed phrase
   Future<bool> verifySeedPhraseBackup(List<String> userWords) async {
     if (_seedPhrase == null) {
