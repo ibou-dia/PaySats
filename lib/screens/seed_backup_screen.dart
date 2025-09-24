@@ -40,7 +40,7 @@ class _SeedBackupScreenState extends State<SeedBackupScreen> {
     }
   }
 
-  Future<void> _continueToPin() async {
+  Future<void> _continueToHome() async {
     setState(() {
       _isLoading = true;
       _errorMessage = null;
@@ -49,12 +49,23 @@ class _SeedBackupScreenState extends State<SeedBackupScreen> {
     try {
       final authService = Provider.of<AuthService>(context, listen: false);
       
-      // Marquer la seed phrase comme sauvegardée sans vérification
+      // Marquer la seed phrase comme sauvegardée et finaliser l'inscription
       await authService.markSeedPhraseAsBackedUp();
+      
+      // Finaliser l'inscription avec un ID utilisateur généré
+      final userId = DateTime.now().millisecondsSinceEpoch.toString();
+      await authService.completeRegistration(userId);
+      
+      // Marquer l'utilisateur comme authentifié directement
+      await authService.authenticateDirectly();
 
       if (mounted) {
-        // Naviguer vers la configuration du PIN
-        Navigator.pushReplacementNamed(context, '/pin-setup');
+        // Naviguer directement vers l'écran d'accueil
+        Navigator.pushNamedAndRemoveUntil(
+          context,
+          '/home',
+          (route) => false,
+        );
       }
     } catch (e) {
       setState(() {
@@ -263,7 +274,7 @@ class _SeedBackupScreenState extends State<SeedBackupScreen> {
         SizedBox(
           width: double.infinity,
           child: ElevatedButton(
-            onPressed: _isLoading ? null : _continueToPin,
+            onPressed: _isLoading ? null : _continueToHome,
             child: _isLoading
                 ? const SizedBox(
                     height: 20,

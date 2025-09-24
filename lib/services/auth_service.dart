@@ -431,4 +431,20 @@ class AuthService extends ChangeNotifier {
       createdAt: DateTime.now(),
     );
   }
+
+  /// Authentifier directement l'utilisateur sans PIN
+  Future<void> authenticateDirectly() async {
+    try {
+      _authState = _authState.copyWith(
+        status: AuthStatus.authenticated,
+        sessionExpiresAt: DateTime.now().add(const Duration(days: 30)),
+        lastLoginAt: DateTime.now(),
+      );
+
+      await _saveAuthState();
+      notifyListeners();
+    } catch (e) {
+      throw Exception('Erreur lors de l\'authentification: $e');
+    }
+  }
 }

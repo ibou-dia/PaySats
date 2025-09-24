@@ -23,7 +23,6 @@ import 'screens/splash_screen.dart';
 import 'screens/registration_screen.dart';
 import 'screens/otp_verification_screen.dart';
 import 'screens/seed_backup_screen.dart';
-import 'screens/pin_setup_screen.dart';
 import 'screens/login_screen.dart';
 import 'screens/recovery_screen.dart';
 import 'screens/reset_pin_screen.dart';
@@ -70,7 +69,6 @@ class MyApp extends StatelessWidget {
           '/registration': (context) => const RegistrationScreen(),
           '/otp-verification': (context) => const OtpVerificationScreen(),
           '/seed-backup': (context) => const SeedBackupScreen(),
-          '/pin-setup': (context) => const PinSetupScreen(),
           '/login': (context) => const LoginScreen(),
           '/recovery': (context) => const RecoveryScreen(),
           '/reset-pin': (context) => const ResetPinScreen(),

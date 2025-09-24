@@ -142,9 +142,9 @@ class _OtpVerificationScreenState extends State<OtpVerificationScreen> {
             );
           }
         } else if (_otpType == OtpType.recovery) {
-          // Récupération de compte - aller à la réinitialisation du PIN
+          // Récupération de compte - aller directement à l'écran d'accueil
           if (mounted) {
-            Navigator.pushReplacementNamed(context, '/pin-setup');
+            Navigator.pushReplacementNamed(context, '/home');
           }
         } else {
           // Vérification téléphone standard
