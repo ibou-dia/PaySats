@@ -234,7 +234,7 @@ class CurrencyScreen extends StatelessWidget {
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   Text(
-                    currency,
+                    currency == 'XOF' ? 'FCFA' : currency,
                     style: Theme.of(context).textTheme.titleMedium?.copyWith(
                           fontWeight: isSelected
                               ? FontWeight.bold
@@ -246,7 +246,7 @@ class CurrencyScreen extends StatelessWidget {
                   ),
                   if (rate > 0)
                     Text(
-                      '1 BTC = ${rate.toStringAsFixed(2)} $currency',
+                      '1 BTC = ${rate.toStringAsFixed(2)} ${currency == 'XOF' ? 'FCFA' : currency}',
                       style: Theme.of(context).textTheme.bodySmall?.copyWith(
                             color: AppTheme.textSecondary,
                           ),
@@ -293,6 +293,7 @@ class CurrencyScreen extends StatelessWidget {
       case 'CAD': return 'C\$';
       case 'AUD': return 'A\$';
       case 'CHF': return 'Fr';
+      case 'XOF': return 'CFA';
       default: return currencyCode[0];
     }
   }

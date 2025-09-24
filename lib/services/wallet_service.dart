@@ -41,7 +41,7 @@ class WalletService extends ChangeNotifier {
           type: WalletType.bitcoin,
           address: address,
           balance: balance,
-          currency: 'BTC',
+          currency: 'SATS',
           connected: true,
           createdAt: DateTime.now(),
         );
@@ -70,7 +70,7 @@ class WalletService extends ChangeNotifier {
       
       final prefs = await SharedPreferences.getInstance();
       await prefs.setString(Constants.keyWalletAddress, Constants.dummyWalletAddress);
-      await prefs.setDouble(Constants.keyWalletBalance, 0.0125);
+      await prefs.setDouble(Constants.keyWalletBalance, 1250000); // 0.0125 BTC = 1,250,000 sats
       
       _wallet = Wallet(
         id: 'wallet_${DateTime.now().millisecondsSinceEpoch}',
@@ -78,8 +78,8 @@ class WalletService extends ChangeNotifier {
         name: 'Mon Wallet Bitcoin',
         type: WalletType.bitcoin,
         address: Constants.dummyWalletAddress,
-        balance: 0.0125,
-        currency: 'BTC',
+        balance: 1250000, // Balance en sats
+        currency: 'SATS',
         connected: true,
         createdAt: DateTime.now(),
       );
@@ -113,7 +113,7 @@ class WalletService extends ChangeNotifier {
         type: WalletType.bitcoin,
         address: Constants.dummyWalletAddress,
         balance: 0,
-        currency: 'BTC',
+        currency: 'SATS',
         connected: true,
         createdAt: DateTime.now(),
       );

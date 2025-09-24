@@ -105,7 +105,7 @@ class _HomeScreenState extends State<HomeScreen> {
                       ),
                       const SizedBox(height: 8),
                       Text(
-                        '${Formatters.formatBitcoin(wallet.balance)} sBTC',
+                        '${Formatters.formatSats(wallet.balance)} SATS',
                         style: Theme.of(context).textTheme.headlineLarge?.copyWith(
                               color: Colors.white,
                               fontWeight: FontWeight.bold,
@@ -114,8 +114,8 @@ class _HomeScreenState extends State<HomeScreen> {
                       const SizedBox(height: 4),
                       Consumer<CurrencyService>(
                         builder: (context, currencyService, _) {
-                          // Convertir le solde BTC en devise fiat
-                          final fiatBalance = currencyService.btcToFiat(wallet.balance);
+                          // Convertir le solde SATS en devise fiat
+                          final fiatBalance = currencyService.satsToFiat(wallet.balance);
                           return Text(
                             currencyService.formatFiatAmount(fiatBalance),
                             style: Theme.of(context).textTheme.titleMedium?.copyWith(

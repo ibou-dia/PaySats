@@ -16,36 +16,36 @@ class SendScreen extends StatefulWidget {
 class _SendScreenState extends State<SendScreen> {
   final _formKey = GlobalKey<FormState>();
   final _addressController = TextEditingController();
-  final _btcAmountController = TextEditingController();
+  final _satsAmountController = TextEditingController();
   final _fiatAmountController = TextEditingController();
   bool _isSending = false;
   String? _errorMessage;
-  bool _inputInFiat = false; // Track whether user is inputting in sBTC or fiat
+  bool _inputInFiat = false; // Track whether user is inputting in SATS or fiat
 
   @override
   void initState() {
     super.initState();
-    _btcAmountController.addListener(_onBtcAmountChanged);
+    _satsAmountController.addListener(_onSatsAmountChanged);
     _fiatAmountController.addListener(_onFiatAmountChanged);
   }
 
   @override
   void dispose() {
-    _btcAmountController.removeListener(_onBtcAmountChanged);
+    _satsAmountController.removeListener(_onSatsAmountChanged);
     _fiatAmountController.removeListener(_onFiatAmountChanged);
     _addressController.dispose();
-    _btcAmountController.dispose();
+    _satsAmountController.dispose();
     _fiatAmountController.dispose();
     super.dispose();
   }
 
-  // When BTC amount changes, update the fiat amount
-  void _onBtcAmountChanged() {
+  // When SATS amount changes, update the fiat amount
+  void _onSatsAmountChanged() {
     if (_inputInFiat) return; // Avoid infinite loop
     
     final currencyService = Provider.of<CurrencyService>(context, listen: false);
     
-    if (_btcAmountController.text.isEmpty) {
+    if (_satsAmountController.text.isEmpty) {
       // Si le champ est vide, vider aussi le champ de devise fiat
       _fiatAmountController.text = '';
       return;
@@ -53,14 +53,14 @@ class _SendScreenState extends State<SendScreen> {
     
     try {
       // Vérifier si la valeur est un nombre valide
-      final btcText = _btcAmountController.text;
-      if (btcText == '0' || btcText == '0.0' || btcText == '0.00') {
+      final satsText = _satsAmountController.text;
+      if (satsText == '0' || satsText == '0.0' || satsText == '0.00') {
         _fiatAmountController.text = '0.00';
         return;
       }
       
-      final btcAmount = double.parse(btcText);
-      final fiatAmount = currencyService.btcToFiat(btcAmount);
+      final satsAmount = double.parse(satsText);
+      final fiatAmount = currencyService.satsToFiat(satsAmount);
       
       // Désactiver temporairement les écouteurs pour éviter les boucles de mise à jour
       _inputInFiat = true;
@@ -81,8 +81,8 @@ class _SendScreenState extends State<SendScreen> {
     final currencyService = Provider.of<CurrencyService>(context, listen: false);
     
     if (_fiatAmountController.text.isEmpty) {
-      // Si le champ est vide, vider aussi le champ BTC
-      _btcAmountController.text = '';
+      // Si le champ est vide, vider aussi le champ SATS
+      _satsAmountController.text = '';
       return;
     }
     
@@ -90,16 +90,16 @@ class _SendScreenState extends State<SendScreen> {
       // Vérifier si la valeur est un nombre valide
       final fiatText = _fiatAmountController.text;
       if (fiatText == '0' || fiatText == '0.0' || fiatText == '0.00') {
-        _btcAmountController.text = '0.00000000';
+        _satsAmountController.text = '0';
         return;
       }
       
       final fiatAmount = double.parse(fiatText);
-      final btcAmount = currencyService.fiatToBtc(fiatAmount);
+      final satsAmount = currencyService.fiatToSats(fiatAmount);
       
       // Désactiver temporairement les écouteurs pour éviter les boucles de mise à jour
       _inputInFiat = false;
-      _btcAmountController.text = btcAmount.toStringAsFixed(8);
+      _satsAmountController.text = satsAmount.toStringAsFixed(0);
       // Délai pour remettre le flag à true afin d'éviter les problèmes de timing
       Future.delayed(Duration.zero, () {
         _inputInFiat = true;
@@ -125,7 +125,7 @@ class _SendScreenState extends State<SendScreen> {
 
     try {
       final address = _addressController.text.trim();
-      final amount = double.parse(_btcAmountController.text);
+      final amount = double.parse(_satsAmountController.text);
       
       final success = await walletService.sendTransaction(address, amount);
       
@@ -179,7 +179,7 @@ class _SendScreenState extends State<SendScreen> {
           onPressed: () => Navigator.pushReplacementNamed(context, '/home'),
         ),
         title: const Text(
-          'Send sBTC',
+          'Send SATS',
           style: TextStyle(color: AppTheme.textPrimary),
         ),
       ),
@@ -225,7 +225,7 @@ class _SendScreenState extends State<SendScreen> {
                             ),
                             const SizedBox(height: 4),
                             Text(
-                              '${Formatters.formatBitcoin(wallet.balance)} sBTC',
+                              '${Formatters.formatSats(wallet.balance)} SATS',
                               style: Theme.of(context).textTheme.titleLarge,
                             ),
                           ],
@@ -247,16 +247,16 @@ class _SendScreenState extends State<SendScreen> {
               TextFormField(
                 controller: _addressController,
                 decoration: const InputDecoration(
-                  hintText: 'Enter sBTC address',
+                  hintText: 'Enter SATS address',
                   prefixIcon: Icon(Icons.person),
                 ),
                 validator: (value) {
                   if (value == null || value.trim().isEmpty) {
                     return 'Please enter an address';
                   }
-                  // In a real app, validate the sBTC address format
+                  // In a real app, validate the SATS address format
                   if (value.length < 10) {
-                    return 'Please enter a valid sBTC address';
+                    return 'Please enter a valid SATS address';
                   }
                   return null;
                 },
@@ -279,7 +279,7 @@ class _SendScreenState extends State<SendScreen> {
                     ),
                     label: Text(
                       _inputInFiat 
-                          ? 'Switch to sBTC' 
+                          ? 'Switch to SATS' 
                           : 'Switch to ${currencyService.selectedCurrency}',
                       style: const TextStyle(fontSize: 14),
                     ),
@@ -295,7 +295,7 @@ class _SendScreenState extends State<SendScreen> {
               
               // Currency conversion UI
               AnimatedCrossFade(
-                firstChild: _buildBtcInput(wallet),
+                firstChild: _buildSatsInput(wallet),
                 secondChild: _buildFiatInput(currencyService),
                 crossFadeState: _inputInFiat 
                     ? CrossFadeState.showSecond 
@@ -312,7 +312,7 @@ class _SendScreenState extends State<SendScreen> {
               SizedBox(
                 width: double.infinity,
                 child: ElevatedButton(
-                  onPressed: _isSending || _btcAmountController.text.isEmpty
+                  onPressed: _isSending || _satsAmountController.text.isEmpty
                       ? null
                       : () => _sendTransaction(walletService),
                   child: _isSending
@@ -376,18 +376,18 @@ class _SendScreenState extends State<SendScreen> {
     );
   }
   
-  Widget _buildBtcInput(wallet) {
+  Widget _buildSatsInput(wallet) {
     return TextFormField(
-      controller: _btcAmountController,
+      controller: _satsAmountController,
       decoration: const InputDecoration(
         hintText: 'Enter amount',
         prefixIcon: Icon(Icons.currency_bitcoin),
-        suffixText: 'sBTC',
+        suffixText: 'SATS',
       ),
       keyboardType: const TextInputType.numberWithOptions(decimal: true),
-      // Limiter la saisie à 8 décimales
+      // Limiter la saisie aux nombres entiers pour les SATS
       inputFormatters: [
-        FilteringTextInputFormatter.allow(RegExp(r'^\d*\.?\d{0,8}')),
+        FilteringTextInputFormatter.allow(RegExp(r'^\d*')),
       ],
       // Ne pas mettre à jour pendant la frappe mais seulement lors de la perte de focus
       onChanged: (value) {
@@ -395,7 +395,7 @@ class _SendScreenState extends State<SendScreen> {
         // L'écouteur _onBtcAmountChanged s'occupe de la mise à jour
       },
       onTap: () {
-        // Si l'utilisateur touche le champ, s'assurer qu'il est en mode BTC
+        // Si l'utilisateur touche le champ, s'assurer qu'il est en mode SATS
         setState(() {
           _inputInFiat = false;
         });
@@ -450,9 +450,9 @@ class _SendScreenState extends State<SendScreen> {
             return 'Amount must be greater than 0';
           }
           
-          // Vérifier si le montant équivalent en BTC est supérieur au solde
-          final btcAmount = currencyService.fiatToBtc(amount);
-          if (btcAmount > Provider.of<WalletService>(context, listen: false).wallet!.balance) {
+          // Vérifier si le montant équivalent en SATS est supérieur au solde
+          final satsAmount = currencyService.fiatToSats(amount);
+          if (satsAmount > Provider.of<WalletService>(context, listen: false).wallet!.balance) {
             return 'Insufficient balance';
           }
         } catch (e) {
@@ -470,14 +470,14 @@ class _SendScreenState extends State<SendScreen> {
       if (_inputInFiat) {
         if (_fiatAmountController.text.isNotEmpty) {
           final fiatAmount = double.parse(_fiatAmountController.text);
-          final btcAmount = currencyService.fiatToBtc(fiatAmount);
-          displayText = '${fiatAmount.toStringAsFixed(2)} ${currencyService.selectedCurrency} = ${Formatters.formatBitcoin(btcAmount)} sBTC';
+          final satsAmount = currencyService.fiatToSats(fiatAmount);
+          displayText = '${fiatAmount.toStringAsFixed(2)} ${currencyService.selectedCurrency} = ${Formatters.formatSats(satsAmount)} SATS';
         }
       } else {
-        if (_btcAmountController.text.isNotEmpty) {
-          final btcAmount = double.parse(_btcAmountController.text);
-          final fiatAmount = currencyService.btcToFiat(btcAmount);
-          displayText = '${Formatters.formatBitcoin(btcAmount)} sBTC = ${fiatAmount.toStringAsFixed(2)} ${currencyService.selectedCurrency}';
+        if (_satsAmountController.text.isNotEmpty) {
+          final satsAmount = double.parse(_satsAmountController.text);
+          final fiatAmount = currencyService.satsToFiat(satsAmount);
+          displayText = '${Formatters.formatSats(satsAmount)} SATS = ${fiatAmount.toStringAsFixed(2)} ${currencyService.selectedCurrency}';
         }
       }
     } catch (e) {

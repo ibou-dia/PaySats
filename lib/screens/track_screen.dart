@@ -86,7 +86,7 @@ class TrackScreen extends StatelessWidget {
                               ),
                               const SizedBox(height: 4),
                               Text(
-                                '${Formatters.formatBitcoin(wallet.balance)} sBTC',
+                                '${Formatters.formatSats(wallet.balance)} SATS',
                                 style: Theme.of(context).textTheme.titleMedium,
                               ),
                             ],

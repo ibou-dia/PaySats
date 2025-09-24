@@ -44,7 +44,7 @@ class AboutScreen extends StatelessWidget {
             
             // App description
             const Text(
-              'sBTC Wallet is a mobile application for managing your tokenized Bitcoin (sBTC) on the Stacks blockchain.',
+              'sBTC Wallet is a mobile application for managing your tokenized Bitcoin (SATS) on the Stacks blockchain.',
               textAlign: TextAlign.center,
             ),
             const SizedBox(height: 24),

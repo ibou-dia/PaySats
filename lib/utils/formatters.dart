@@ -12,6 +12,15 @@ class Formatters {
     return amount.toStringAsFixed(decimals).replaceAll(RegExp(r'([.]*0+)$'), '');
   }
 
+  /// Formats a Satoshi amount with proper formatting
+  static String formatSats(double amount) {
+    // Format sats as whole numbers with thousand separators
+    return amount.toInt().toString().replaceAllMapped(
+      RegExp(r'(\d{1,3})(?=(\d{3})+(?!\d))'),
+      (Match m) => '${m[1]},',
+    );
+  }
+
   /// Format transaction date
   static String formatDate(DateTime date) {
     final now = DateTime.now();

@@ -44,7 +44,7 @@ class ReceiveScreen extends StatelessWidget {
               ),
               const SizedBox(height: 8),
               Text(
-                'Share this address to receive sBTC from others',
+                  'Share this address to receive SATS from others',
                 style: Theme.of(context).textTheme.bodyMedium?.copyWith(
                       color: AppTheme.textSecondary,
                     ),

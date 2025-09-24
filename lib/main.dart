@@ -25,7 +25,6 @@ import 'screens/otp_verification_screen.dart';
 import 'screens/seed_backup_screen.dart';
 import 'screens/login_screen.dart';
 import 'screens/recovery_screen.dart';
-import 'screens/auth_screen.dart';
 
 // Import theme
 import 'theme/app_theme.dart';
@@ -56,7 +55,7 @@ class MyApp extends StatelessWidget {
         routes: {
           // Initial screen
           '/splash': (context) => const SplashScreen(),
-          
+
           // Main routes
           Constants.routeAuth: (context) => const AuthScreen(),
           Constants.routeHome: (context) => const HomeScreen(),
@@ -64,7 +63,7 @@ class MyApp extends StatelessWidget {
           Constants.routeReceive: (context) => const ReceiveScreen(),
           Constants.routeTransactions: (context) => const TransactionsScreen(),
           Constants.routeOnboarding: (context) => const OnboardingScreen(),
-          
+
           // Authentication routes
           '/registration': (context) => const RegistrationScreen(),
           '/otp-verification': (context) => const OtpVerificationScreen(),
@@ -72,7 +71,7 @@ class MyApp extends StatelessWidget {
           '/login': (context) => const LoginScreen(),
           '/recovery': (context) => const RecoveryScreen(),
           '/welcome': (context) => const AuthScreen(),
-          
+
           // Drawer routes
           '/account': (context) => const AccountScreen(),
           '/track': (context) => const TrackScreen(),

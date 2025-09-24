@@ -66,7 +66,7 @@ class AccountScreen extends StatelessWidget {
                     _buildInfoRow(
                       context, 
                       title: 'Current Balance', 
-                      value: '${Formatters.formatBitcoin(wallet.balance)} sBTC',
+                      value: '${Formatters.formatSats(wallet.balance)} SATS',
                     ),
                     const Divider(height: 32),
                     

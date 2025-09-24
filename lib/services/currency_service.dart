@@ -4,7 +4,7 @@ import 'package:http/http.dart' as http;
 import 'package:shared_preferences/shared_preferences.dart';
 
 class CurrencyService extends ChangeNotifier {
-  static const String _priceApiUrl = 'https://api.coingecko.com/api/v3/simple/price?ids=bitcoin&vs_currencies=usd,eur,gbp,jpy,cad,aud,chf';
+  static const String _priceApiUrl = 'https://api.coingecko.com/api/v3/simple/price?ids=bitcoin&vs_currencies=usd,eur,gbp,jpy,cad,aud,chf,xof';
   static const String _prefKeyCurrency = 'selected_currency';
   
   Map<String, double> _exchangeRates = {
@@ -15,6 +15,7 @@ class CurrencyService extends ChangeNotifier {
     'CAD': 0.0,
     'AUD': 0.0,
     'CHF': 0.0,
+    'XOF': 0.0, // FCFA (Franc CFA)
   };
   
   String _selectedCurrency = 'USD';
@@ -37,8 +38,18 @@ class CurrencyService extends ChangeNotifier {
   // Get the current exchange rate for the selected currency
   double get currentRate => _exchangeRates[_selectedCurrency] ?? 0.0;
   
-  // Get available currencies
-  List<String> get availableCurrencies => _exchangeRates.keys.toList();
+  // Get available currencies with XOF first, then USD, EUR, and others
+  List<String> get availableCurrencies {
+    final currencies = _exchangeRates.keys.toList();
+    // Remove priority currencies to set custom order
+    currencies.remove('XOF');
+    currencies.remove('USD');
+    currencies.remove('EUR');
+    // Sort remaining currencies alphabetically
+    currencies.sort();
+    // Return in desired order: XOF (FCFA), USD, EUR, then others
+    return ['XOF', 'USD', 'EUR', ...currencies];
+  }
   
   // Load the selected currency from SharedPreferences
   Future<void> _loadSelectedCurrency() async {
@@ -57,13 +68,30 @@ class CurrencyService extends ChangeNotifier {
     notifyListeners();
   }
   
-  // Convert from Bitcoin to fiat
+  // Convert from Satoshis to fiat
+  double satsToFiat(double satsAmount) {
+    final rate = _exchangeRates[_selectedCurrency] ?? 0.0;
+    // Convert sats to BTC first (1 BTC = 100,000,000 sats), then to fiat
+    final btcAmount = satsAmount / 100000000;
+    return btcAmount * rate;
+  }
+  
+  // Convert from fiat to Satoshis
+  double fiatToSats(double fiatAmount) {
+    final rate = _exchangeRates[_selectedCurrency] ?? 0.0;
+    if (rate <= 0) return 0.0;
+    // Convert fiat to BTC first, then to sats
+    final btcAmount = fiatAmount / rate;
+    return btcAmount * 100000000;
+  }
+
+  // Convert from Bitcoin to fiat (kept for backward compatibility)
   double btcToFiat(double btcAmount) {
     final rate = _exchangeRates[_selectedCurrency] ?? 0.0;
     return btcAmount * rate;
   }
   
-  // Convert from fiat to Bitcoin
+  // Convert from fiat to Bitcoin (kept for backward compatibility)
   double fiatToBtc(double fiatAmount) {
     final rate = _exchangeRates[_selectedCurrency] ?? 0.0;
     if (rate <= 0) return 0.0;
@@ -75,10 +103,30 @@ class CurrencyService extends ChangeNotifier {
     if (_selectedCurrency == 'JPY') {
       // No decimal places for Japanese Yen
       return '${amount.round()} $_selectedCurrency';
+    } else if (_selectedCurrency == 'XOF') {
+      // No decimal places for CFA Franc (large numbers) with thousand separators
+      final roundedAmount = amount.round();
+      final formattedAmount = _formatWithThousandsSeparator(roundedAmount);
+      return '$formattedAmount FCFA';
     } else {
       // 2 decimal places for other currencies
       return '${amount.toStringAsFixed(2)} $_selectedCurrency';
     }
+  }
+  
+  // Helper method to format numbers with thousands separator (spaces)
+  String _formatWithThousandsSeparator(int number) {
+    final numberStr = number.toString();
+    final reversed = numberStr.split('').reversed.toList();
+    final chunks = <String>[];
+    
+    for (int i = 0; i < reversed.length; i += 3) {
+      final end = (i + 3 < reversed.length) ? i + 3 : reversed.length;
+      final chunk = reversed.sublist(i, end).reversed.join('');
+      chunks.add(chunk);
+    }
+    
+    return chunks.reversed.join(' ');
   }
   
   // Fetch exchange rates from API
@@ -106,7 +154,14 @@ class CurrencyService extends ChangeNotifier {
             'CAD': bitcoin['cad']?.toDouble() ?? 0.0,
             'AUD': bitcoin['aud']?.toDouble() ?? 0.0,
             'CHF': bitcoin['chf']?.toDouble() ?? 0.0,
+            'XOF': 0.0, // Will be calculated from USD rate
           };
+          
+          // Calculate XOF rate from USD (1 USD ≈ 558.62 XOF as of current rates)
+          final usdRate = _exchangeRates['USD'] ?? 0.0;
+          if (usdRate > 0) {
+            _exchangeRates['XOF'] = usdRate * 558.62; // USD to XOF conversion
+          }
           
           _lastUpdated = DateTime.now();
         } else {
@@ -128,6 +183,7 @@ class CurrencyService extends ChangeNotifier {
           'CAD': 88000.0,
           'AUD': 97000.0,
           'CHF': 58000.0,
+          'XOF': 36869320.0, // FCFA fallback rate (66000 * 558.62)
         };
       }
     } finally {
