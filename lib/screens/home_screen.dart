@@ -41,7 +41,7 @@ class _HomeScreenState extends State<HomeScreen> {
         elevation: 0,
         backgroundColor: Colors.transparent,
         title: const Text(
-          'sBTC Wallet',
+          'PaySats',
           style: TextStyle(color: AppTheme.textPrimary),
         ),
         leading: IconButton(

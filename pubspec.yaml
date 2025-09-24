@@ -1,5 +1,5 @@
-name: sbtc_wallet
-description: "A Bitcoin wallet app for sBTC on Stacks blockchain."
+name: paysats
+description: "PaySats - Super wallet qui relie Bitcoin et Mobile Money pour l'Afrique de l'Ouest. Paiements, épargne et investissement dans une seule app."
 # The following line prevents the package from being accidentally published to
 # pub.dev using `flutter pub publish`. This is preferred for private packages.
 publish_to: 'none' # Remove this line if you wish to publish to pub.dev

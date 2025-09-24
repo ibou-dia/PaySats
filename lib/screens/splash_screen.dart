@@ -73,20 +73,22 @@ class _SplashScreenState extends State<SplashScreen> with SingleTickerProviderSt
                     const SizedBox(height: 24),
                     
                     // App name
-                    Text(
-                      Constants.appName,
-                      style: Theme.of(context).textTheme.headlineLarge?.copyWith(
+                    const Text(
+                      'PaySats',
+                      style: TextStyle(
+                        fontSize: 32,
                         fontWeight: FontWeight.bold,
-                        color: AppTheme.bitcoinOrange,
+                        color: AppTheme.textPrimary,
                       ),
                     ),
                     
-                    const SizedBox(height: 16),
+                    const SizedBox(height: 8),
                     
                     // Tagline
-                    Text(
-                      'Your secure Bitcoin wallet on Stacks',
-                      style: Theme.of(context).textTheme.bodyLarge?.copyWith(
+                    const Text(
+                      'Votre super wallet pour l\'Afrique',
+                      style: TextStyle(
+                        fontSize: 16,
                         color: AppTheme.textSecondary,
                       ),
                     ),

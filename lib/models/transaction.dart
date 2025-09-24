@@ -1,61 +1,413 @@
 enum TransactionType {
-  sent,
-  received
+  // Bitcoin transactions
+  bitcoinSent,
+  bitcoinReceived,
+  
+  // Lightning Network transactions
+  lightningSent,
+  lightningReceived,
+  
+  // Mobile Money transactions
+  mobileMoneyDeposit,
+  mobileMoneyWithdraw,
+  mobileMoneyTransfer,
+  
+  // Vault operations
+  vaultDeposit,
+  vaultWithdraw,
+  vaultInterest,
+  
+  // Investment operations
+  investmentBuy,
+  investmentSell,
+  investmentDividend,
+  
+  // Internal transfers
+  internalTransfer,
+  
+  // Fees and charges
+  networkFee,
+  serviceFee,
+  
+  // Other
+  refund,
+  bonus
+}
+
+enum TransactionStatus {
+  pending,
+  processing,
+  completed,
+  failed,
+  cancelled,
+  expired
+}
+
+enum TransactionCategory {
+  payment,
+  transfer,
+  investment,
+  savings,
+  fee,
+  reward
 }
 
 class Transaction {
   final String id;
+  final String userId;
   final TransactionType type;
+  final TransactionStatus status;
+  final TransactionCategory category;
   final double amount;
-  final String address;
+  final String currency;
+  final double? fees;
+  final String? fromAddress;
+  final String? toAddress;
+  final String? fromAccount; // For mobile money, vault, etc.
+  final String? toAccount;
   final DateTime timestamp;
-  final String hash;
+  final DateTime? completedAt;
+  final String? hash;
+  final String? txid;
   final bool confirmed;
+  final int? confirmations;
+  final String? description;
+  final String? memo;
+  final String? reference;
+  final Map<String, dynamic>? metadata;
+  
+  // Related entity IDs
+  final String? walletId;
+  final String? vaultId;
+  final String? investmentId;
+  final String? mobileMoneyAccountId;
+  final String? lightningPaymentId;
 
-  Transaction({
+  const Transaction({
     required this.id,
+    required this.userId,
     required this.type,
+    this.status = TransactionStatus.completed,
+    required this.category,
     required this.amount,
-    required this.address,
+    this.currency = 'BTC',
+    this.fees,
+    this.fromAddress,
+    this.toAddress,
+    this.fromAccount,
+    this.toAccount,
     required this.timestamp,
-    required this.hash,
+    this.completedAt,
+    this.hash,
+    this.txid,
     this.confirmed = true,
+    this.confirmations,
+    this.description,
+    this.memo,
+    this.reference,
+    this.metadata,
+    this.walletId,
+    this.vaultId,
+    this.investmentId,
+    this.mobileMoneyAccountId,
+    this.lightningPaymentId,
   });
 
-  // Generate some sample transactions
+  // Méthodes utilitaires
+  Transaction copyWith({
+    String? id,
+    String? userId,
+    TransactionType? type,
+    TransactionStatus? status,
+    TransactionCategory? category,
+    double? amount,
+    String? currency,
+    double? fees,
+    String? fromAddress,
+    String? toAddress,
+    String? fromAccount,
+    String? toAccount,
+    DateTime? timestamp,
+    DateTime? completedAt,
+    String? hash,
+    String? txid,
+    bool? confirmed,
+    int? confirmations,
+    String? description,
+    String? memo,
+    String? reference,
+    Map<String, dynamic>? metadata,
+    String? walletId,
+    String? vaultId,
+    String? investmentId,
+    String? mobileMoneyAccountId,
+    String? lightningPaymentId,
+  }) {
+    return Transaction(
+      id: id ?? this.id,
+      userId: userId ?? this.userId,
+      type: type ?? this.type,
+      status: status ?? this.status,
+      category: category ?? this.category,
+      amount: amount ?? this.amount,
+      currency: currency ?? this.currency,
+      fees: fees ?? this.fees,
+      fromAddress: fromAddress ?? this.fromAddress,
+      toAddress: toAddress ?? this.toAddress,
+      fromAccount: fromAccount ?? this.fromAccount,
+      toAccount: toAccount ?? this.toAccount,
+      timestamp: timestamp ?? this.timestamp,
+      completedAt: completedAt ?? this.completedAt,
+      hash: hash ?? this.hash,
+      txid: txid ?? this.txid,
+      confirmed: confirmed ?? this.confirmed,
+      confirmations: confirmations ?? this.confirmations,
+      description: description ?? this.description,
+      memo: memo ?? this.memo,
+      reference: reference ?? this.reference,
+      metadata: metadata ?? this.metadata,
+      walletId: walletId ?? this.walletId,
+      vaultId: vaultId ?? this.vaultId,
+      investmentId: investmentId ?? this.investmentId,
+      mobileMoneyAccountId: mobileMoneyAccountId ?? this.mobileMoneyAccountId,
+      lightningPaymentId: lightningPaymentId ?? this.lightningPaymentId,
+    );
+  }
+
+  Map<String, dynamic> toJson() {
+    return {
+      'id': id,
+      'userId': userId,
+      'type': type.name,
+      'status': status.name,
+      'category': category.name,
+      'amount': amount,
+      'currency': currency,
+      'fees': fees,
+      'fromAddress': fromAddress,
+      'toAddress': toAddress,
+      'fromAccount': fromAccount,
+      'toAccount': toAccount,
+      'timestamp': timestamp.toIso8601String(),
+      'completedAt': completedAt?.toIso8601String(),
+      'hash': hash,
+      'txid': txid,
+      'confirmed': confirmed,
+      'confirmations': confirmations,
+      'description': description,
+      'memo': memo,
+      'reference': reference,
+      'metadata': metadata,
+      'walletId': walletId,
+      'vaultId': vaultId,
+      'investmentId': investmentId,
+      'mobileMoneyAccountId': mobileMoneyAccountId,
+      'lightningPaymentId': lightningPaymentId,
+    };
+  }
+
+  factory Transaction.fromJson(Map<String, dynamic> json) {
+    return Transaction(
+      id: json['id'],
+      userId: json['userId'],
+      type: TransactionType.values.firstWhere(
+        (e) => e.name == json['type'],
+        orElse: () => TransactionType.bitcoinReceived,
+      ),
+      status: TransactionStatus.values.firstWhere(
+        (e) => e.name == json['status'],
+        orElse: () => TransactionStatus.completed,
+      ),
+      category: TransactionCategory.values.firstWhere(
+        (e) => e.name == json['category'],
+        orElse: () => TransactionCategory.payment,
+      ),
+      amount: json['amount']?.toDouble() ?? 0.0,
+      currency: json['currency'] ?? 'BTC',
+      fees: json['fees']?.toDouble(),
+      fromAddress: json['fromAddress'],
+      toAddress: json['toAddress'],
+      fromAccount: json['fromAccount'],
+      toAccount: json['toAccount'],
+      timestamp: DateTime.parse(json['timestamp']),
+      completedAt: json['completedAt'] != null 
+          ? DateTime.parse(json['completedAt']) 
+          : null,
+      hash: json['hash'],
+      txid: json['txid'],
+      confirmed: json['confirmed'] ?? true,
+      confirmations: json['confirmations'],
+      description: json['description'],
+      memo: json['memo'],
+      reference: json['reference'],
+      metadata: json['metadata'] != null 
+          ? Map<String, dynamic>.from(json['metadata']) 
+          : null,
+      walletId: json['walletId'],
+      vaultId: json['vaultId'],
+      investmentId: json['investmentId'],
+      mobileMoneyAccountId: json['mobileMoneyAccountId'],
+      lightningPaymentId: json['lightningPaymentId'],
+    );
+  }
+
+  // Getters utilitaires
+  String get displayType {
+    switch (type) {
+      case TransactionType.bitcoinSent:
+        return 'Bitcoin envoyé';
+      case TransactionType.bitcoinReceived:
+        return 'Bitcoin reçu';
+      case TransactionType.lightningSent:
+        return 'Lightning envoyé';
+      case TransactionType.lightningReceived:
+        return 'Lightning reçu';
+      case TransactionType.mobileMoneyDeposit:
+        return 'Dépôt Mobile Money';
+      case TransactionType.mobileMoneyWithdraw:
+        return 'Retrait Mobile Money';
+      case TransactionType.mobileMoneyTransfer:
+        return 'Transfert Mobile Money';
+      case TransactionType.vaultDeposit:
+        return 'Dépôt coffre';
+      case TransactionType.vaultWithdraw:
+        return 'Retrait coffre';
+      case TransactionType.vaultInterest:
+        return 'Intérêts coffre';
+      case TransactionType.investmentBuy:
+        return 'Achat investissement';
+      case TransactionType.investmentSell:
+        return 'Vente investissement';
+      case TransactionType.investmentDividend:
+        return 'Dividende';
+      case TransactionType.internalTransfer:
+        return 'Transfert interne';
+      case TransactionType.networkFee:
+        return 'Frais réseau';
+      case TransactionType.serviceFee:
+        return 'Frais service';
+      case TransactionType.refund:
+        return 'Remboursement';
+      case TransactionType.bonus:
+        return 'Bonus';
+    }
+  }
+
+  String get displayStatus {
+    switch (status) {
+      case TransactionStatus.pending:
+        return 'En attente';
+      case TransactionStatus.processing:
+        return 'En cours';
+      case TransactionStatus.completed:
+        return 'Terminé';
+      case TransactionStatus.failed:
+        return 'Échoué';
+      case TransactionStatus.cancelled:
+        return 'Annulé';
+      case TransactionStatus.expired:
+        return 'Expiré';
+    }
+  }
+
+  String get formattedAmount {
+    final sign = isOutgoing ? '-' : '+';
+    return '$sign${amount.toStringAsFixed(8)} $currency';
+  }
+
+  String get formattedFees {
+    if (fees == null) return '';
+    return '${fees!.toStringAsFixed(8)} $currency';
+  }
+
+  bool get isOutgoing {
+    return [
+      TransactionType.bitcoinSent,
+      TransactionType.lightningSent,
+      TransactionType.mobileMoneyWithdraw,
+      TransactionType.vaultDeposit,
+      TransactionType.investmentBuy,
+      TransactionType.networkFee,
+      TransactionType.serviceFee,
+    ].contains(type);
+  }
+
+  bool get isIncoming {
+    return [
+      TransactionType.bitcoinReceived,
+      TransactionType.lightningReceived,
+      TransactionType.mobileMoneyDeposit,
+      TransactionType.vaultWithdraw,
+      TransactionType.vaultInterest,
+      TransactionType.investmentSell,
+      TransactionType.investmentDividend,
+      TransactionType.refund,
+      TransactionType.bonus,
+    ].contains(type);
+  }
+
+  bool get isPending => status == TransactionStatus.pending;
+  bool get isCompleted => status == TransactionStatus.completed;
+  bool get isFailed => status == TransactionStatus.failed;
+
+  // Génération d'exemples de transactions
   static List<Transaction> getSampleTransactions() {
+    final now = DateTime.now();
     return [
       Transaction(
         id: '1',
-        type: TransactionType.received,
+        userId: 'user123',
+        type: TransactionType.bitcoinReceived,
+        category: TransactionCategory.payment,
         amount: 0.0025,
-        address: 'SP2JXKMSH007NPYAQHKJPQMAQYAD90NQGTVJVQ02B',
-        timestamp: DateTime.now().subtract(const Duration(hours: 2)),
+        toAddress: 'SP2JXKMSH007NPYAQHKJPQMAQYAD90NQGTVJVQ02B',
+        timestamp: now.subtract(const Duration(hours: 2)),
         hash: '0x1234567890abcdef1234567890abcdef',
+        description: 'Paiement reçu',
       ),
       Transaction(
         id: '2',
-        type: TransactionType.sent,
+        userId: 'user123',
+        type: TransactionType.bitcoinSent,
+        category: TransactionCategory.payment,
         amount: 0.001,
-        address: 'SP1HTBVD3JG9C05J7HBJTHGR0GGW7KXW28M5JS8QE',
-        timestamp: DateTime.now().subtract(const Duration(days: 1)),
+        fromAddress: 'SP1HTBVD3JG9C05J7HBJTHGR0GGW7KXW28M5JS8QE',
+        timestamp: now.subtract(const Duration(days: 1)),
         hash: '0xabcdef1234567890abcdef1234567890',
+        fees: 0.00001,
+        description: 'Paiement envoyé',
       ),
       Transaction(
         id: '3',
-        type: TransactionType.received,
+        userId: 'user123',
+        type: TransactionType.vaultDeposit,
+        category: TransactionCategory.savings,
         amount: 0.005,
-        address: 'SP3FBR2AGK5H9QBDH3EEN6DF8EK8JY7RX8QJ5SVTE',
-        timestamp: DateTime.now().subtract(const Duration(days: 3)),
-        hash: '0x7890abcdef1234567890abcdef123456',
+        timestamp: now.subtract(const Duration(days: 3)),
+        vaultId: 'vault1',
+        description: 'Dépôt dans le coffre épargne',
       ),
       Transaction(
         id: '4',
-        type: TransactionType.sent,
-        amount: 0.0015,
-        address: 'SP2837ZMC89J37E31K8KPWSD2DY5RFBJTGZ7BD27A',
-        timestamp: DateTime.now().subtract(const Duration(days: 5)),
-        hash: '0xdef1234567890abcdef1234567890abc',
+        userId: 'user123',
+        type: TransactionType.mobileMoneyDeposit,
+        category: TransactionCategory.transfer,
+        amount: 50000,
+        currency: 'XOF',
+        timestamp: now.subtract(const Duration(days: 5)),
+        mobileMoneyAccountId: 'wave1',
+        fromAccount: 'Wave - 77 123 45 67',
+        description: 'Dépôt depuis Wave',
+      ),
+      Transaction(
+        id: '5',
+        userId: 'user123',
+        type: TransactionType.lightningReceived,
+        category: TransactionCategory.payment,
+        amount: 0.0001,
+        timestamp: now.subtract(const Duration(hours: 6)),
+        lightningPaymentId: 'ln1',
+        description: 'Paiement Lightning reçu',
       ),
     ];
   }

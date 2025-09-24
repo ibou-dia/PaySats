@@ -34,16 +34,16 @@ class TransactionItem extends StatelessWidget {
                 width: 40,
                 height: 40,
                 decoration: BoxDecoration(
-                  color: transaction.type == TransactionType.received
-                      ? Colors.green.withOpacity(0.2)
-                      : Colors.red.withOpacity(0.2),
+                  color: transaction.isIncoming
+                      ? Colors.green.withValues(alpha: 0.2)
+                      : Colors.red.withValues(alpha: 0.2),
                   shape: BoxShape.circle,
                 ),
                 child: Icon(
-                  transaction.type == TransactionType.received
+                  transaction.isIncoming
                       ? Icons.arrow_downward_rounded
                       : Icons.arrow_upward_rounded,
-                  color: transaction.type == TransactionType.received
+                  color: transaction.isIncoming
                       ? Colors.green
                       : Colors.red,
                   size: 20,
@@ -56,25 +56,24 @@ class TransactionItem extends StatelessWidget {
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     Text(
-                      transaction.type == TransactionType.received
-                          ? 'Received'
-                          : 'Sent',
+                      transaction.displayType,
                       style: Theme.of(context).textTheme.titleMedium,
                     ),
                     const SizedBox(height: 4),
                     Text(
-                      Formatters.shortenAddress(transaction.address),
+                      _getDisplayAddress(),
                       style: Theme.of(context).textTheme.bodyMedium?.copyWith(
                             color: AppTheme.textSecondary,
                           ),
                     ),
                     const SizedBox(height: 4),
-                    Text(
-                      Formatters.shortenAddress(transaction.hash, start: 8, end: 8),
-                      style: Theme.of(context).textTheme.bodySmall?.copyWith(
-                            color: AppTheme.textSecondary.withOpacity(0.7),
-                          ),
-                    ),
+                    if (transaction.hash != null)
+                      Text(
+                        Formatters.shortenAddress(transaction.hash!, start: 8, end: 8),
+                        style: Theme.of(context).textTheme.bodySmall?.copyWith(
+                              color: AppTheme.textSecondary.withValues(alpha: 0.7),
+                            ),
+                      ),
                   ],
                 ),
               ),
@@ -83,9 +82,9 @@ class TransactionItem extends StatelessWidget {
                 crossAxisAlignment: CrossAxisAlignment.end,
                 children: [
                   Text(
-                    '${transaction.type == TransactionType.received ? '+' : '-'} ${Formatters.formatBitcoin(transaction.amount)} sBTC',
+                    transaction.formattedAmount,
                     style: Theme.of(context).textTheme.titleMedium?.copyWith(
-                          color: transaction.type == TransactionType.received
+                          color: transaction.isIncoming
                               ? Colors.green
                               : Colors.red,
                         ),
@@ -104,5 +103,22 @@ class TransactionItem extends StatelessWidget {
         ),
       ),
     );
+  }
+
+  String _getDisplayAddress() {
+    // Priorité : toAddress > fromAddress > toAccount > fromAccount
+    if (transaction.toAddress != null) {
+      return Formatters.shortenAddress(transaction.toAddress!);
+    }
+    if (transaction.fromAddress != null) {
+      return Formatters.shortenAddress(transaction.fromAddress!);
+    }
+    if (transaction.toAccount != null) {
+      return transaction.toAccount!;
+    }
+    if (transaction.fromAccount != null) {
+      return transaction.fromAccount!;
+    }
+    return transaction.description ?? 'Transaction';
   }
 }

@@ -35,9 +35,15 @@ class WalletService extends ChangeNotifier {
 
       if (address != null) {
         _wallet = Wallet(
+          id: 'wallet_${DateTime.now().millisecondsSinceEpoch}',
+          userId: 'user_demo',
+          name: 'Mon Wallet Bitcoin',
+          type: WalletType.bitcoin,
           address: address,
           balance: balance,
+          currency: 'BTC',
           connected: true,
+          createdAt: DateTime.now(),
         );
       }
       _setLoading(false);
@@ -67,9 +73,15 @@ class WalletService extends ChangeNotifier {
       await prefs.setDouble(Constants.keyWalletBalance, 0.0125);
       
       _wallet = Wallet(
+        id: 'wallet_${DateTime.now().millisecondsSinceEpoch}',
+        userId: 'user_demo',
+        name: 'Mon Wallet Bitcoin',
+        type: WalletType.bitcoin,
         address: Constants.dummyWalletAddress,
         balance: 0.0125,
+        currency: 'BTC',
         connected: true,
+        createdAt: DateTime.now(),
       );
       
       _setLoading(false);
@@ -95,9 +107,15 @@ class WalletService extends ChangeNotifier {
       await prefs.setDouble(Constants.keyWalletBalance, 0);
       
       _wallet = Wallet(
+        id: 'wallet_${DateTime.now().millisecondsSinceEpoch}',
+        userId: 'user_demo',
+        name: 'Mon Wallet Bitcoin',
+        type: WalletType.bitcoin,
         address: Constants.dummyWalletAddress,
         balance: 0,
+        currency: 'BTC',
         connected: true,
+        createdAt: DateTime.now(),
       );
       
       _setLoading(false);
@@ -124,12 +142,18 @@ class WalletService extends ChangeNotifier {
       // Create new transaction
       final newTransaction = Transaction(
         id: DateTime.now().millisecondsSinceEpoch.toString(),
-        type: TransactionType.sent,
+        userId: 'current_user', // In a real app, this would be the actual user ID
+        type: TransactionType.bitcoinSent,
+        status: TransactionStatus.completed,
+        category: TransactionCategory.payment,
         amount: amount,
-        address: toAddress,
+        currency: 'BTC',
+        toAddress: toAddress,
         timestamp: DateTime.now(),
+        completedAt: DateTime.now(),
         hash: '0x${DateTime.now().millisecondsSinceEpoch.toRadixString(16)}',
-        confirmed: true,
+        confirmations: 6,
+        description: 'Bitcoin envoyé',
       );
       
       // Update wallet balance

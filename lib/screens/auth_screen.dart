@@ -42,18 +42,23 @@ class AuthScreen extends StatelessWidget {
                     // Logo and title
                     const BitcoinLogo(size: 80),
                     const SizedBox(height: 32),
-                    Text(
-                      'Welcome to Your Bitcoin Wallet',
-                      style: Theme.of(context).textTheme.headlineMedium,
+                    const Text(
+                      'Bienvenue sur PaySats',
+                      style: TextStyle(
+                        fontSize: 28,
+                        fontWeight: FontWeight.bold,
+                        color: AppTheme.textPrimary,
+                      ),
                       textAlign: TextAlign.center,
                     ),
-                    const SizedBox(height: 16),
-                    Text(
-                      'Manage your tokenized Bitcoin via the sBTC protocol on Stacks blockchain',
-                      style: Theme.of(context).textTheme.bodyLarge?.copyWith(
-                            color: AppTheme.textSecondary,
-                          ),
+                    const SizedBox(height: 8),
+                    const Text(
+                      'Gérez vos paiements, épargne et investissements avec Bitcoin et Mobile Money',
                       textAlign: TextAlign.center,
+                      style: TextStyle(
+                        fontSize: 16,
+                        color: AppTheme.textSecondary,
+                      ),
                     ),
                     
                     SizedBox(height: size.height * 0.08),

@@ -4,6 +4,8 @@ import 'package:provider/provider.dart';
 // Import services
 import 'services/wallet_service.dart';
 import 'services/currency_service.dart';
+import 'services/auth_service.dart';
+import 'services/otp_service.dart';
 
 // Import screens
 import 'screens/auth_screen.dart';
@@ -18,6 +20,13 @@ import 'screens/currency_screen.dart';
 import 'screens/settings_screen.dart';
 import 'screens/about_screen.dart';
 import 'screens/splash_screen.dart';
+import 'screens/registration_screen.dart';
+import 'screens/otp_verification_screen.dart';
+import 'screens/seed_backup_screen.dart';
+import 'screens/pin_setup_screen.dart';
+import 'screens/login_screen.dart';
+import 'screens/recovery_screen.dart';
+import 'screens/reset_pin_screen.dart';
 
 // Import theme
 import 'theme/app_theme.dart';
@@ -38,6 +47,8 @@ class MyApp extends StatelessWidget {
       providers: [
         ChangeNotifierProvider(create: (_) => WalletService()),
         ChangeNotifierProvider(create: (_) => CurrencyService()),
+        ChangeNotifierProvider(create: (_) => AuthService()),
+        ChangeNotifierProvider(create: (_) => OtpService()),
       ],
       child: MaterialApp(
         title: Constants.appName,
@@ -54,6 +65,15 @@ class MyApp extends StatelessWidget {
           Constants.routeReceive: (context) => const ReceiveScreen(),
           Constants.routeTransactions: (context) => const TransactionsScreen(),
           Constants.routeOnboarding: (context) => const OnboardingScreen(),
+          
+          // Authentication routes
+          '/registration': (context) => const RegistrationScreen(),
+          '/otp-verification': (context) => const OtpVerificationScreen(),
+          '/seed-backup': (context) => const SeedBackupScreen(),
+          '/pin-setup': (context) => const PinSetupScreen(),
+          '/login': (context) => const LoginScreen(),
+          '/recovery': (context) => const RecoveryScreen(),
+          '/reset-pin': (context) => const ResetPinScreen(),
           
           // Drawer routes
           '/account': (context) => const AccountScreen(),

@@ -1,4 +1,4 @@
-package com.example.sbtc_wallet
+package com.example.paysats
 
 import io.flutter.embedding.android.FlutterActivity
 

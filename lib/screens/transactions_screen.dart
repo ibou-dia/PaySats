@@ -33,8 +33,10 @@ class _TransactionsScreenState extends State<TransactionsScreen> {
     if (_searchQuery.isNotEmpty) {
       filteredTransactions = filteredTransactions
           .where((t) => 
-              t.address.toLowerCase().contains(_searchQuery.toLowerCase()) ||
-              t.hash.toLowerCase().contains(_searchQuery.toLowerCase()))
+              (t.toAddress?.toLowerCase().contains(_searchQuery.toLowerCase()) ?? false) ||
+              (t.fromAddress?.toLowerCase().contains(_searchQuery.toLowerCase()) ?? false) ||
+              (t.hash?.toLowerCase().contains(_searchQuery.toLowerCase()) ?? false) ||
+              (t.description?.toLowerCase().contains(_searchQuery.toLowerCase()) ?? false))
           .toList();
     }
 
@@ -94,21 +96,21 @@ class _TransactionsScreenState extends State<TransactionsScreen> {
                       ),
                       const SizedBox(width: 8),
                       _buildFilterChip(
-                        label: 'Received',
-                        selected: _filterType == TransactionType.received,
+                        label: 'Reçu',
+                        selected: _filterType == TransactionType.bitcoinReceived,
                         onSelected: (selected) {
                           setState(() {
-                            _filterType = selected ? TransactionType.received : null;
+                            _filterType = selected ? TransactionType.bitcoinReceived : null;
                           });
                         },
                       ),
                       const SizedBox(width: 8),
                       _buildFilterChip(
-                        label: 'Sent',
-                        selected: _filterType == TransactionType.sent,
+                        label: 'Envoyé',
+                        selected: _filterType == TransactionType.bitcoinSent,
                         onSelected: (selected) {
                           setState(() {
-                            _filterType = selected ? TransactionType.sent : null;
+                            _filterType = selected ? TransactionType.bitcoinSent : null;
                           });
                         },
                       ),
@@ -175,20 +177,35 @@ class _TransactionsScreenState extends State<TransactionsScreen> {
   Widget _buildFilterChip({
     required String label,
     required bool selected,
-    required Function(bool) onSelected,
+    required ValueChanged<bool> onSelected,
   }) {
     return FilterChip(
       label: Text(label),
       selected: selected,
       onSelected: onSelected,
       backgroundColor: AppTheme.cardBackground,
-      selectedColor: AppTheme.bitcoinOrange.withOpacity(0.2),
+      selectedColor: AppTheme.bitcoinOrange.withValues(alpha: 0.2),
       checkmarkColor: AppTheme.bitcoinOrange,
       labelStyle: TextStyle(
-        color: selected ? AppTheme.bitcoinOrange : AppTheme.textPrimary,
-        fontWeight: selected ? FontWeight.w500 : FontWeight.normal,
+        color: selected ? AppTheme.bitcoinOrange : AppTheme.textSecondary,
       ),
     );
+  }
+
+  String _getTransactionAddress(Transaction transaction) {
+    if (transaction.toAddress != null && transaction.toAddress!.isNotEmpty) {
+      return transaction.toAddress!;
+    }
+    if (transaction.fromAddress != null && transaction.fromAddress!.isNotEmpty) {
+      return transaction.fromAddress!;
+    }
+    if (transaction.toAccount != null && transaction.toAccount!.isNotEmpty) {
+      return transaction.toAccount!;
+    }
+    if (transaction.fromAccount != null && transaction.fromAccount!.isNotEmpty) {
+      return transaction.fromAccount!;
+    }
+    return transaction.description ?? 'Adresse inconnue';
   }
 
   void _showTransactionDetails(BuildContext context, Transaction transaction) {
@@ -217,16 +234,16 @@ class _TransactionsScreenState extends State<TransactionsScreen> {
                       width: 48,
                       height: 48,
                       decoration: BoxDecoration(
-                        color: transaction.type == TransactionType.received
-                            ? Colors.green.withOpacity(0.2)
-                            : Colors.red.withOpacity(0.2),
+                        color: transaction.isIncoming
+                            ? Colors.green.withValues(alpha: 0.2)
+                            : Colors.red.withValues(alpha: 0.2),
                         shape: BoxShape.circle,
                       ),
                       child: Icon(
-                        transaction.type == TransactionType.received
+                        transaction.isIncoming
                             ? Icons.arrow_downward_rounded
                             : Icons.arrow_upward_rounded,
-                        color: transaction.type == TransactionType.received
+                        color: transaction.isIncoming
                             ? Colors.green
                             : Colors.red,
                       ),
@@ -237,9 +254,7 @@ class _TransactionsScreenState extends State<TransactionsScreen> {
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
                           Text(
-                            transaction.type == TransactionType.received
-                                ? 'Received sBTC'
-                                : 'Sent sBTC',
+                            transaction.displayType,
                             style: Theme.of(context).textTheme.headlineSmall,
                           ),
                           Text(
@@ -257,23 +272,25 @@ class _TransactionsScreenState extends State<TransactionsScreen> {
                 const Divider(height: 32),
                 
                 // Transaction details
-                _buildDetailRow(context, 'Amount', 
-                  '${transaction.type == TransactionType.received ? '+' : '-'} ${transaction.amount} sBTC',
-                  valueColor: transaction.type == TransactionType.received
+                _buildDetailRow(context, 'Montant', 
+                  transaction.formattedAmount,
+                  valueColor: transaction.isIncoming
                       ? Colors.green
                       : Colors.red,
                 ),
                 const SizedBox(height: 16),
                 _buildDetailRow(context, 
-                  transaction.type == TransactionType.received ? 'From' : 'To', 
-                  transaction.address,
+                  transaction.isIncoming ? 'De' : 'Vers', 
+                  _getTransactionAddress(transaction),
                 ),
                 const SizedBox(height: 16),
-                _buildDetailRow(context, 'Transaction Hash', transaction.hash),
-                const SizedBox(height: 16),
-                _buildDetailRow(context, 'Status', 
-                  transaction.confirmed ? 'Confirmed' : 'Pending',
-                  valueColor: transaction.confirmed ? Colors.green : Colors.orange,
+                if (transaction.hash != null)
+                  _buildDetailRow(context, 'Hash de transaction', transaction.hash!),
+                if (transaction.hash != null)
+                  const SizedBox(height: 16),
+                _buildDetailRow(context, 'Statut', 
+                  transaction.displayStatus,
+                  valueColor: transaction.isCompleted ? Colors.green : Colors.orange,
                 ),
                 
                 const SizedBox(height: 32),

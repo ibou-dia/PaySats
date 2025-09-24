@@ -14,26 +14,32 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
   
   final List<OnboardingPage> _pages = [
     OnboardingPage(
-      title: 'Welcome to sBTC Wallet',
-      description: 'Your secure and easy-to-use wallet for tokenized Bitcoin on the Stacks blockchain.',
+      title: 'Bienvenue sur PaySats',
+      description: 'Votre super wallet qui relie Bitcoin et Mobile Money pour l\'Afrique de l\'Ouest.',
       image: 'assets/images/onboarding_1.png',
       imageIcon: Icons.account_balance_wallet,
     ),
     OnboardingPage(
-      title: 'What is sBTC?',
-      description: 'sBTC is a tokenized version of Bitcoin that can be used on the Stacks blockchain, enabling smart contract functionality while backed 1:1 by BTC.',
+      title: 'Qu\'est-ce que PaySats?',
+      description: 'PaySats combine Bitcoin, Mobile Money, épargne et investissement dans une seule application simple et sécurisée.',
       image: 'assets/images/onboarding_2.png',
       imageIcon: Icons.currency_bitcoin,
     ),
     OnboardingPage(
-      title: 'Secure & Decentralized',
-      description: 'sBTC inherits the security of Bitcoin while adding the programmability of Stacks blockchain technology.',
+      title: 'Sécurité Avancée',
+      description: 'Votre wallet Bitcoin est protégé par une phrase de récupération et un code PIN. Vos clés privées restent toujours sous votre contrôle.',
       image: 'assets/images/onboarding_3.png',
-      imageIcon: Icons.shield,
+      imageIcon: Icons.security,
     ),
     OnboardingPage(
-      title: 'Ready to Start?',
-      description: 'Start managing your sBTC with ease. Send, receive, and track your transactions in one simple application.',
+      title: 'Authentification Sécurisée',
+      description: 'Créez votre compte avec votre numéro de téléphone, sauvegardez votre phrase de récupération et configurez votre PIN de sécurité.',
+      image: 'assets/images/onboarding_auth.png',
+      imageIcon: Icons.verified_user,
+    ),
+    OnboardingPage(
+      title: 'Commencez Maintenant',
+      description: 'Gérez vos paiements, épargne et investissements facilement. Envoyez, recevez et suivez vos transactions.',
       image: 'assets/images/onboarding_4.png',
       imageIcon: Icons.rocket_launch,
     ),
@@ -52,12 +58,14 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
         curve: Curves.easeInOut,
       );
     } else {
-      Navigator.pushReplacementNamed(context, '/home');
+      // Navigate to registration instead of home
+      Navigator.pushReplacementNamed(context, '/registration');
     }
   }
 
   void _skipOnboarding() {
-    Navigator.pushReplacementNamed(context, '/home');
+    // Navigate to registration instead of home
+    Navigator.pushReplacementNamed(context, '/registration');
   }
 
   @override
@@ -72,7 +80,7 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
               child: TextButton(
                 onPressed: _skipOnboarding,
                 child: Text(
-                  'Skip',
+                  'Passer',
                   style: TextStyle(
                     color: AppTheme.textSecondary,
                     fontWeight: FontWeight.w500,
@@ -129,7 +137,7 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
                       padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 12),
                     ),
                     child: Text(
-                      _currentPage == _pages.length - 1 ? 'Get Started' : 'Next',
+                      _currentPage == _pages.length - 1 ? 'Créer mon compte' : 'Suivant',
                     ),
                   ),
                 ],

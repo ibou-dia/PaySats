@@ -235,7 +235,7 @@ class TrackScreen extends StatelessWidget {
   }
   
   Widget _buildTransactionStatusItem(BuildContext context, Transaction transaction, WalletService walletService) {
-    final isReceived = transaction.type == TransactionType.received;
+    final isReceived = transaction.isIncoming;
     
     return Column(
       children: [
@@ -246,8 +246,8 @@ class TrackScreen extends StatelessWidget {
               height: 40,
               decoration: BoxDecoration(
                 color: isReceived
-                    ? Colors.green.withOpacity(0.1)
-                    : Colors.orange.withOpacity(0.1),
+                    ? Colors.green.withValues(alpha: 0.1)
+                    : Colors.orange.withValues(alpha: 0.1),
                 shape: BoxShape.circle,
               ),
               child: Icon(
@@ -264,11 +264,11 @@ class TrackScreen extends StatelessWidget {
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   Text(
-                    isReceived ? 'Received sBTC' : 'Sent sBTC',
+                    transaction.displayType,
                     style: Theme.of(context).textTheme.titleMedium,
                   ),
                   Text(
-                    '${Formatters.formatBitcoin(transaction.amount)} sBTC',
+                    transaction.formattedAmount,
                     style: Theme.of(context).textTheme.bodyMedium?.copyWith(
                           fontWeight: FontWeight.w500,
                         ),
