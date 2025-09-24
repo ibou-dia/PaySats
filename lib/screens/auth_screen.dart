@@ -70,7 +70,7 @@ class AuthScreen extends StatelessWidget {
                         onPressed: walletService.isLoading
                             ? null
                             : () {
-                                Navigator.pushReplacementNamed(context, '/registration');
+                                Navigator.pushNamed(context, '/registration');
                               },
                         style: ElevatedButton.styleFrom(
                           backgroundColor: AppTheme.bitcoinOrange,

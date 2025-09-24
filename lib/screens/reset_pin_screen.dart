@@ -55,9 +55,10 @@ class _ResetPinScreenState extends State<ResetPinScreen>
   @override
   void didChangeDependencies() {
     super.didChangeDependencies();
-    
+
     // Récupérer les arguments de navigation
-    final args = ModalRoute.of(context)?.settings.arguments as Map<String, dynamic>?;
+    final args =
+        ModalRoute.of(context)?.settings.arguments as Map<String, dynamic>?;
     _phoneNumber = args?['phoneNumber'];
   }
 
@@ -85,7 +86,6 @@ class _ResetPinScreenState extends State<ResetPinScreen>
   }
 
   void _onPinDigitChanged(int index, String value) {
-    final controllers = _isConfirmStep ? _confirmControllers : _pinControllers;
     final focusNodes = _isConfirmStep ? _confirmFocusNodes : _pinFocusNodes;
 
     if (value.isNotEmpty && index < 5) {
@@ -164,11 +164,7 @@ class _ResetPinScreenState extends State<ResetPinScreen>
         );
 
         // Naviguer vers l'écran de connexion
-        Navigator.pushNamedAndRemoveUntil(
-          context,
-          '/login',
-          (route) => false,
-        );
+        Navigator.pushNamedAndRemoveUntil(context, '/login', (route) => false);
       }
     } catch (e) {
       setState(() {
@@ -196,14 +192,14 @@ class _ResetPinScreenState extends State<ResetPinScreen>
       _isConfirmStep = false;
       _firstPin = '';
     });
-    
+
     for (var controller in _pinControllers) {
       controller.clear();
     }
     for (var controller in _confirmControllers) {
       controller.clear();
     }
-    
+
     _pinFocusNodes[0].requestFocus();
   }
 
@@ -258,9 +254,7 @@ class _ResetPinScreenState extends State<ResetPinScreen>
                   counterText: '',
                   border: OutlineInputBorder(
                     borderRadius: BorderRadius.circular(12),
-                    borderSide: BorderSide(
-                      color: Colors.grey.shade300,
-                    ),
+                    borderSide: BorderSide(color: Colors.grey.shade300),
                   ),
                   focusedBorder: OutlineInputBorder(
                     borderRadius: BorderRadius.circular(12),
@@ -271,15 +265,10 @@ class _ResetPinScreenState extends State<ResetPinScreen>
                   ),
                   errorBorder: OutlineInputBorder(
                     borderRadius: BorderRadius.circular(12),
-                    borderSide: const BorderSide(
-                      color: Colors.red,
-                      width: 2,
-                    ),
+                    borderSide: const BorderSide(color: Colors.red, width: 2),
                   ),
                 ),
-                inputFormatters: [
-                  FilteringTextInputFormatter.digitsOnly,
-                ],
+                inputFormatters: [FilteringTextInputFormatter.digitsOnly],
                 onChanged: (value) => _onPinDigitChanged(index, value),
               ),
             );
@@ -311,7 +300,7 @@ class _ResetPinScreenState extends State<ResetPinScreen>
               ),
             ),
           ),
-          
+
           // Content
           SafeArea(
             child: FadeTransition(
@@ -330,7 +319,9 @@ class _ResetPinScreenState extends State<ResetPinScreen>
                         ),
                         Expanded(
                           child: Text(
-                            _isConfirmStep ? 'Confirmer le nouveau PIN' : 'Nouveau PIN',
+                            _isConfirmStep
+                                ? 'Confirmer le nouveau PIN'
+                                : 'Nouveau PIN',
                             style: const TextStyle(
                               fontSize: 24,
                               fontWeight: FontWeight.bold,
@@ -342,9 +333,9 @@ class _ResetPinScreenState extends State<ResetPinScreen>
                         const SizedBox(width: 48),
                       ],
                     ),
-                    
+
                     SizedBox(height: size.height * 0.06),
-                    
+
                     // Icon and description
                     Center(
                       child: Column(
@@ -357,7 +348,9 @@ class _ResetPinScreenState extends State<ResetPinScreen>
                               borderRadius: BorderRadius.circular(40),
                             ),
                             child: Icon(
-                              _isConfirmStep ? Icons.check_circle_outline : Icons.lock_reset,
+                              _isConfirmStep
+                                  ? Icons.check_circle_outline
+                                  : Icons.lock_reset,
                               size: 40,
                               color: Colors.green.shade600,
                             ),
@@ -400,18 +393,25 @@ class _ResetPinScreenState extends State<ResetPinScreen>
                         ],
                       ),
                     ),
-                    
+
                     SizedBox(height: size.height * 0.06),
-                    
+
                     // PIN Input
                     _buildPinInput(
-                      controllers: _isConfirmStep ? _confirmControllers : _pinControllers,
-                      focusNodes: _isConfirmStep ? _confirmFocusNodes : _pinFocusNodes,
-                      label: _isConfirmStep ? 'Confirmez votre nouveau PIN' : 'Entrez votre nouveau PIN',
+                      controllers:
+                          _isConfirmStep
+                              ? _confirmControllers
+                              : _pinControllers,
+                      focusNodes:
+                          _isConfirmStep ? _confirmFocusNodes : _pinFocusNodes,
+                      label:
+                          _isConfirmStep
+                              ? 'Confirmez votre nouveau PIN'
+                              : 'Entrez votre nouveau PIN',
                     ),
-                    
+
                     const SizedBox(height: 32),
-                    
+
                     // Security info
                     if (!_isConfirmStep)
                       Container(
@@ -426,7 +426,10 @@ class _ResetPinScreenState extends State<ResetPinScreen>
                           children: [
                             Row(
                               children: [
-                                Icon(Icons.security, color: Colors.green.shade600),
+                                Icon(
+                                  Icons.security,
+                                  color: Colors.green.shade600,
+                                ),
                                 const SizedBox(width: 8),
                                 Text(
                                   'Récupération réussie',
@@ -443,22 +446,24 @@ class _ResetPinScreenState extends State<ResetPinScreen>
                               '• Seul l\'accès par PIN est réinitialisé',
                               '• Choisissez un code facile à retenir',
                               '• Évitez les séquences simples (123456)',
-                            ].map((tip) => Padding(
-                              padding: const EdgeInsets.only(bottom: 4),
-                              child: Text(
-                                tip,
-                                style: TextStyle(
-                                  color: Colors.green.shade700,
-                                  fontSize: 14,
+                            ].map(
+                              (tip) => Padding(
+                                padding: const EdgeInsets.only(bottom: 4),
+                                child: Text(
+                                  tip,
+                                  style: TextStyle(
+                                    color: Colors.green.shade700,
+                                    fontSize: 14,
+                                  ),
                                 ),
                               ),
-                            )),
+                            ),
                           ],
                         ),
                       ),
-                    
+
                     const SizedBox(height: 24),
-                    
+
                     // Error message
                     if (_errorMessage != null)
                       Container(
@@ -471,7 +476,10 @@ class _ResetPinScreenState extends State<ResetPinScreen>
                         ),
                         child: Row(
                           children: [
-                            Icon(Icons.error_outline, color: Colors.red.shade600),
+                            Icon(
+                              Icons.error_outline,
+                              color: Colors.red.shade600,
+                            ),
                             const SizedBox(width: 8),
                             Expanded(
                               child: Text(
@@ -482,27 +490,35 @@ class _ResetPinScreenState extends State<ResetPinScreen>
                           ],
                         ),
                       ),
-                    
+
                     // Action button
                     SizedBox(
                       width: double.infinity,
                       child: ElevatedButton(
-                        onPressed: _isLoading || _currentPin.length != 6
-                            ? null
-                            : (_isConfirmStep ? _confirmPin : _proceedToConfirm),
-                        child: _isLoading
-                            ? const SizedBox(
-                                height: 20,
-                                width: 20,
-                                child: CircularProgressIndicator(
-                                  color: Colors.white,
-                                  strokeWidth: 2,
+                        onPressed:
+                            _isLoading || _currentPin.length != 6
+                                ? null
+                                : (_isConfirmStep
+                                    ? _confirmPin
+                                    : _proceedToConfirm),
+                        child:
+                            _isLoading
+                                ? const SizedBox(
+                                  height: 20,
+                                  width: 20,
+                                  child: CircularProgressIndicator(
+                                    color: Colors.white,
+                                    strokeWidth: 2,
+                                  ),
+                                )
+                                : Text(
+                                  _isConfirmStep
+                                      ? 'Réinitialiser le PIN'
+                                      : 'Continuer',
                                 ),
-                              )
-                            : Text(_isConfirmStep ? 'Réinitialiser le PIN' : 'Continuer'),
                       ),
                     ),
-                    
+
                     // Progress indicator
                     const SizedBox(height: 24),
                     Center(
@@ -522,16 +538,17 @@ class _ResetPinScreenState extends State<ResetPinScreen>
                             width: 8,
                             height: 8,
                             decoration: BoxDecoration(
-                              color: _isConfirmStep 
-                                  ? Colors.green.shade600 
-                                  : Colors.grey.shade300,
+                              color:
+                                  _isConfirmStep
+                                      ? Colors.green.shade600
+                                      : Colors.grey.shade300,
                               borderRadius: BorderRadius.circular(4),
                             ),
                           ),
                         ],
                       ),
                     ),
-                    
+
                     SizedBox(height: size.height * 0.04),
                   ],
                 ),

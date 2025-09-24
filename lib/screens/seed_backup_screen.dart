@@ -13,7 +13,6 @@ class SeedBackupScreen extends StatefulWidget {
 }
 
 class _SeedBackupScreenState extends State<SeedBackupScreen> {
-  bool _isLoading = false;
   String? _errorMessage;
 
   @override
@@ -24,10 +23,10 @@ class _SeedBackupScreenState extends State<SeedBackupScreen> {
   Future<void> _copySeedPhrase() async {
     final authService = Provider.of<AuthService>(context, listen: false);
     final seedPhrase = authService.seedPhrase;
-    
+
     if (seedPhrase != null) {
       await Clipboard.setData(ClipboardData(text: seedPhrase.words.join(' ')));
-      
+
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
           const SnackBar(
@@ -40,40 +39,9 @@ class _SeedBackupScreenState extends State<SeedBackupScreen> {
     }
   }
 
-  Future<void> _continueToHome() async {
-    setState(() {
-      _isLoading = true;
-      _errorMessage = null;
-    });
-
-    try {
-      final authService = Provider.of<AuthService>(context, listen: false);
-      
-      // Marquer la seed phrase comme sauvegardée
-      await authService.markSeedPhraseAsBackedUp();
-      
-      // Authentifier directement l'utilisateur
-      await authService.authenticateDirectly();
-
-      if (mounted) {
-        // Naviguer directement vers l'écran d'accueil
-        Navigator.pushNamedAndRemoveUntil(
-          context,
-          '/home',
-          (route) => false,
-        );
-      }
-    } catch (e) {
-      setState(() {
-        _errorMessage = e.toString();
-      });
-    } finally {
-      if (mounted) {
-        setState(() {
-          _isLoading = false;
-        });
-      }
-    }
+  void _continueToHome() {
+    // Navigation directe vers l'écran d'accueil
+    Navigator.pushNamedAndRemoveUntil(context, '/home', (route) => false);
   }
 
   Widget _buildSeedPhraseDisplay() {
@@ -81,9 +49,7 @@ class _SeedBackupScreenState extends State<SeedBackupScreen> {
     final seedPhrase = authService.seedPhrase;
 
     if (seedPhrase == null) {
-      return const Center(
-        child: Text('Aucune seed phrase générée'),
-      );
+      return const Center(child: Text('Aucune seed phrase générée'));
     }
 
     return Column(
@@ -202,44 +168,40 @@ class _SeedBackupScreenState extends State<SeedBackupScreen> {
         const SizedBox(height: 16),
 
         // Security tips
-        Container(
-          padding: const EdgeInsets.all(16),
-          decoration: BoxDecoration(
-            color: Colors.blue.shade50,
-            borderRadius: BorderRadius.circular(12),
-            border: Border.all(color: Colors.blue.shade200),
-          ),
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Row(
-                children: [
-                  Icon(Icons.security, color: Colors.blue.shade600),
-                  const SizedBox(width: 8),
-                  Text(
-                    'Conseils de sécurité',
-                    style: TextStyle(
-                      fontWeight: FontWeight.bold,
-                      color: Colors.blue.shade800,
-                    ),
-                  ),
-                ],
-              ),
-              const SizedBox(height: 12),
-              Text(
-                '• Écrivez cette phrase sur papier et conservez-la en lieu sûr\n'
-                '• Ne la partagez jamais avec personne\n'
-                '• Ne la stockez pas sur un appareil connecté à internet\n'
-                '• Vérifiez que vous l\'avez bien notée avant de continuer',
-                style: TextStyle(
-                  color: Colors.blue.shade700,
-                  height: 1.5,
-                ),
-              ),
-            ],
-          ),
-        ),
-
+        // Container(
+        //   padding: const EdgeInsets.all(16),
+        //   decoration: BoxDecoration(
+        //     color: Colors.blue.shade50,
+        //     borderRadius: BorderRadius.circular(12),
+        //     border: Border.all(color: Colors.blue.shade200),
+        //   ),
+        //   child: Column(
+        //     crossAxisAlignment: CrossAxisAlignment.start,
+        //     children: [
+        //       Row(
+        //         children: [
+        //           Icon(Icons.security, color: Colors.blue.shade600),
+        //           const SizedBox(width: 8),
+        //           Text(
+        //             'Conseils de sécurité',
+        //             style: TextStyle(
+        //               fontWeight: FontWeight.bold,
+        //               color: Colors.blue.shade800,
+        //             ),
+        //           ),
+        //         ],
+        //       ),
+        //       const SizedBox(height: 12),
+        //       Text(
+        //         '• Écrivez cette phrase sur papier et conservez-la en lieu sûr\n'
+        //         '• Ne la partagez jamais avec personne\n'
+        //         '• Ne la stockez pas sur un appareil connecté à internet\n'
+        //         '• Vérifiez que vous l\'avez bien notée avant de continuer',
+        //         style: TextStyle(color: Colors.blue.shade700, height: 1.5),
+        //       ),
+        //     ],
+        //   ),
+        // ),
         const SizedBox(height: 32),
 
         // Error message
@@ -270,17 +232,8 @@ class _SeedBackupScreenState extends State<SeedBackupScreen> {
         SizedBox(
           width: double.infinity,
           child: ElevatedButton(
-            onPressed: _isLoading ? null : _continueToHome,
-            child: _isLoading
-                ? const SizedBox(
-                    height: 20,
-                    width: 20,
-                    child: CircularProgressIndicator(
-                      color: Colors.white,
-                      strokeWidth: 2,
-                    ),
-                  )
-                : const Text('J\'ai sauvegardé ma phrase - Continuer'),
+            onPressed: _continueToHome,
+            child: const Text('Continuer'),
           ),
         ),
       ],
@@ -289,8 +242,6 @@ class _SeedBackupScreenState extends State<SeedBackupScreen> {
 
   @override
   Widget build(BuildContext context) {
-    final size = MediaQuery.of(context).size;
-
     return Scaffold(
       body: Stack(
         children: [
@@ -301,21 +252,21 @@ class _SeedBackupScreenState extends State<SeedBackupScreen> {
                 gradient: LinearGradient(
                   begin: Alignment.topLeft,
                   end: Alignment.bottomRight,
-                  colors: [
-                    Color(0xFFF8F9FA),
-                    Color(0xFFE9ECEF),
-                  ],
+                  colors: [Color(0xFFF8F9FA), Color(0xFFE9ECEF)],
                 ),
               ),
             ),
           ),
-          
+
           SafeArea(
             child: Column(
               children: [
                 // Header
                 Container(
-                  padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 16),
+                  padding: const EdgeInsets.symmetric(
+                    horizontal: 24,
+                    vertical: 16,
+                  ),
                   child: Row(
                     children: [
                       IconButton(
@@ -325,7 +276,7 @@ class _SeedBackupScreenState extends State<SeedBackupScreen> {
                       ),
                       Expanded(
                         child: Text(
-                          'Sauvegarde de la phrase de récupération',
+                          'Phrase de récupération',
                           style: const TextStyle(
                             fontSize: 20,
                             fontWeight: FontWeight.bold,

@@ -24,6 +24,13 @@ class _HomeScreenState extends State<HomeScreen> {
     final walletService = Provider.of<WalletService>(context);
     final wallet = walletService.wallet;
 
+    // Si pas de wallet et pas en cours de chargement, créer un wallet
+    if (wallet == null && !walletService.isLoading) {
+      WidgetsBinding.instance.addPostFrameCallback((_) {
+        walletService.createWallet();
+      });
+    }
+
     if (wallet == null) {
       return const Scaffold(
         body: Center(

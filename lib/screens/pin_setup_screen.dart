@@ -75,7 +75,6 @@ class _PinSetupScreenState extends State<PinSetupScreen>
   }
 
   void _onPinDigitChanged(int index, String value) {
-    final controllers = _isConfirmStep ? _confirmControllers : _pinControllers;
     final focusNodes = _isConfirmStep ? _confirmFocusNodes : _pinFocusNodes;
 
     if (value.isNotEmpty && index < 5) {
@@ -146,11 +145,7 @@ class _PinSetupScreenState extends State<PinSetupScreen>
 
       if (mounted) {
         // Naviguer vers l'écran d'accueil
-        Navigator.pushNamedAndRemoveUntil(
-          context,
-          '/home',
-          (route) => false,
-        );
+        Navigator.pushNamedAndRemoveUntil(context, '/home', (route) => false);
       }
     } catch (e) {
       setState(() {
@@ -178,14 +173,14 @@ class _PinSetupScreenState extends State<PinSetupScreen>
       _isConfirmStep = false;
       _firstPin = '';
     });
-    
+
     for (var controller in _pinControllers) {
       controller.clear();
     }
     for (var controller in _confirmControllers) {
       controller.clear();
     }
-    
+
     _pinFocusNodes[0].requestFocus();
   }
 
@@ -240,9 +235,7 @@ class _PinSetupScreenState extends State<PinSetupScreen>
                   counterText: '',
                   border: OutlineInputBorder(
                     borderRadius: BorderRadius.circular(12),
-                    borderSide: BorderSide(
-                      color: Colors.grey.shade300,
-                    ),
+                    borderSide: BorderSide(color: Colors.grey.shade300),
                   ),
                   focusedBorder: OutlineInputBorder(
                     borderRadius: BorderRadius.circular(12),
@@ -253,15 +246,10 @@ class _PinSetupScreenState extends State<PinSetupScreen>
                   ),
                   errorBorder: OutlineInputBorder(
                     borderRadius: BorderRadius.circular(12),
-                    borderSide: const BorderSide(
-                      color: Colors.red,
-                      width: 2,
-                    ),
+                    borderSide: const BorderSide(color: Colors.red, width: 2),
                   ),
                 ),
-                inputFormatters: [
-                  FilteringTextInputFormatter.digitsOnly,
-                ],
+                inputFormatters: [FilteringTextInputFormatter.digitsOnly],
                 onChanged: (value) => _onPinDigitChanged(index, value),
               ),
             );
@@ -293,7 +281,7 @@ class _PinSetupScreenState extends State<PinSetupScreen>
               ),
             ),
           ),
-          
+
           // Content
           SafeArea(
             child: FadeTransition(
@@ -312,7 +300,9 @@ class _PinSetupScreenState extends State<PinSetupScreen>
                         ),
                         Expanded(
                           child: Text(
-                            _isConfirmStep ? 'Confirmer le PIN' : 'Créer un PIN',
+                            _isConfirmStep
+                                ? 'Confirmer le PIN'
+                                : 'Créer un PIN',
                             style: const TextStyle(
                               fontSize: 24,
                               fontWeight: FontWeight.bold,
@@ -324,9 +314,9 @@ class _PinSetupScreenState extends State<PinSetupScreen>
                         const SizedBox(width: 48),
                       ],
                     ),
-                    
+
                     SizedBox(height: size.height * 0.06),
-                    
+
                     // Icon and description
                     Center(
                       child: Column(
@@ -335,11 +325,15 @@ class _PinSetupScreenState extends State<PinSetupScreen>
                             width: 80,
                             height: 80,
                             decoration: BoxDecoration(
-                              color: AppTheme.bitcoinOrange.withValues(alpha: 0.1),
+                              color: AppTheme.bitcoinOrange.withValues(
+                                alpha: 0.1,
+                              ),
                               borderRadius: BorderRadius.circular(40),
                             ),
                             child: Icon(
-                              _isConfirmStep ? Icons.check_circle_outline : Icons.lock_outline,
+                              _isConfirmStep
+                                  ? Icons.check_circle_outline
+                                  : Icons.lock_outline,
                               size: 40,
                               color: AppTheme.bitcoinOrange,
                             ),
@@ -370,18 +364,25 @@ class _PinSetupScreenState extends State<PinSetupScreen>
                         ],
                       ),
                     ),
-                    
+
                     SizedBox(height: size.height * 0.06),
-                    
+
                     // PIN Input
                     _buildPinInput(
-                      controllers: _isConfirmStep ? _confirmControllers : _pinControllers,
-                      focusNodes: _isConfirmStep ? _confirmFocusNodes : _pinFocusNodes,
-                      label: _isConfirmStep ? 'Confirmez votre PIN' : 'Entrez votre PIN',
+                      controllers:
+                          _isConfirmStep
+                              ? _confirmControllers
+                              : _pinControllers,
+                      focusNodes:
+                          _isConfirmStep ? _confirmFocusNodes : _pinFocusNodes,
+                      label:
+                          _isConfirmStep
+                              ? 'Confirmez votre PIN'
+                              : 'Entrez votre PIN',
                     ),
-                    
+
                     const SizedBox(height: 32),
-                    
+
                     // Security info
                     if (!_isConfirmStep)
                       Container(
@@ -396,7 +397,10 @@ class _PinSetupScreenState extends State<PinSetupScreen>
                           children: [
                             Row(
                               children: [
-                                Icon(Icons.info_outline, color: Colors.blue.shade600),
+                                Icon(
+                                  Icons.info_outline,
+                                  color: Colors.blue.shade600,
+                                ),
                                 const SizedBox(width: 8),
                                 Text(
                                   'Conseils de sécurité',
@@ -413,22 +417,24 @@ class _PinSetupScreenState extends State<PinSetupScreen>
                               '• Évitez les séquences simples (123456)',
                               '• Ne partagez jamais votre PIN',
                               '• Vous pourrez le changer dans les paramètres',
-                            ].map((tip) => Padding(
-                              padding: const EdgeInsets.only(bottom: 4),
-                              child: Text(
-                                tip,
-                                style: TextStyle(
-                                  color: Colors.blue.shade700,
-                                  fontSize: 14,
+                            ].map(
+                              (tip) => Padding(
+                                padding: const EdgeInsets.only(bottom: 4),
+                                child: Text(
+                                  tip,
+                                  style: TextStyle(
+                                    color: Colors.blue.shade700,
+                                    fontSize: 14,
+                                  ),
                                 ),
                               ),
-                            )),
+                            ),
                           ],
                         ),
                       ),
-                    
+
                     const SizedBox(height: 24),
-                    
+
                     // Error message
                     if (_errorMessage != null)
                       Container(
@@ -441,7 +447,10 @@ class _PinSetupScreenState extends State<PinSetupScreen>
                         ),
                         child: Row(
                           children: [
-                            Icon(Icons.error_outline, color: Colors.red.shade600),
+                            Icon(
+                              Icons.error_outline,
+                              color: Colors.red.shade600,
+                            ),
                             const SizedBox(width: 8),
                             Expanded(
                               child: Text(
@@ -452,27 +461,33 @@ class _PinSetupScreenState extends State<PinSetupScreen>
                           ],
                         ),
                       ),
-                    
+
                     // Action button
                     SizedBox(
                       width: double.infinity,
                       child: ElevatedButton(
-                        onPressed: _isLoading || _currentPin.length != 6
-                            ? null
-                            : (_isConfirmStep ? _confirmPin : _proceedToConfirm),
-                        child: _isLoading
-                            ? const SizedBox(
-                                height: 20,
-                                width: 20,
-                                child: CircularProgressIndicator(
-                                  color: Colors.white,
-                                  strokeWidth: 2,
+                        onPressed:
+                            _isLoading || _currentPin.length != 6
+                                ? null
+                                : (_isConfirmStep
+                                    ? _confirmPin
+                                    : _proceedToConfirm),
+                        child:
+                            _isLoading
+                                ? const SizedBox(
+                                  height: 20,
+                                  width: 20,
+                                  child: CircularProgressIndicator(
+                                    color: Colors.white,
+                                    strokeWidth: 2,
+                                  ),
+                                )
+                                : Text(
+                                  _isConfirmStep ? 'Confirmer' : 'Continuer',
                                 ),
-                              )
-                            : Text(_isConfirmStep ? 'Confirmer' : 'Continuer'),
                       ),
                     ),
-                    
+
                     // Progress indicator
                     const SizedBox(height: 24),
                     Center(
@@ -492,16 +507,17 @@ class _PinSetupScreenState extends State<PinSetupScreen>
                             width: 8,
                             height: 8,
                             decoration: BoxDecoration(
-                              color: _isConfirmStep 
-                                  ? AppTheme.bitcoinOrange 
-                                  : Colors.grey.shade300,
+                              color:
+                                  _isConfirmStep
+                                      ? AppTheme.bitcoinOrange
+                                      : Colors.grey.shade300,
                               borderRadius: BorderRadius.circular(4),
                             ),
                           ),
                         ],
                       ),
                     ),
-                    
+
                     SizedBox(height: size.height * 0.04),
                   ],
                 ),

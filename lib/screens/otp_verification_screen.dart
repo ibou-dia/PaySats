@@ -26,10 +26,7 @@ class _OtpVerificationScreenState extends State<OtpVerificationScreen> {
   int _resendCountdown = 0;
 
   String? _phoneNumber;
-  String? _firstName;
-  String? _lastName;
   OtpType? _otpType;
-  String? _registrationToken;
   String? _nextRoute;
 
   @override
@@ -58,10 +55,7 @@ class _OtpVerificationScreenState extends State<OtpVerificationScreen> {
         ModalRoute.of(context)?.settings.arguments as Map<String, dynamic>?;
     if (args != null) {
       _phoneNumber = args['phoneNumber'] as String?;
-      _firstName = args['firstName'] as String?;
-      _lastName = args['lastName'] as String?;
       _otpType = args['type'] as OtpType?;
-      _registrationToken = args['registrationToken'] as String?;
       _nextRoute = args['nextRoute'] as String?;
     }
   }
