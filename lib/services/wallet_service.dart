@@ -195,6 +195,54 @@ class WalletService extends ChangeNotifier {
     }
   }
 
+  // Add deposit transaction and update balance
+  Future<bool> addDeposit(double amount, String provider) async {
+    if (_wallet == null || amount <= 0) return false;
+    
+    _setLoading(true);
+    _clearError();
+    
+    try {
+      // Simulate deposit processing
+      await Future.delayed(const Duration(seconds: 2));
+      
+      // Create new deposit transaction
+      final newTransaction = Transaction(
+        id: DateTime.now().millisecondsSinceEpoch.toString(),
+        userId: 'current_user',
+        type: TransactionType.mobileMoneyDeposit,
+        status: TransactionStatus.completed,
+        category: TransactionCategory.payment,
+        amount: amount,
+        currency: 'XOF',
+        fromAccount: '$provider - Dépôt',
+        toAccount: 'Wallet PaySats',
+        timestamp: DateTime.now(),
+        completedAt: DateTime.now(),
+        description: 'Dépôt via $provider',
+        mobileMoneyAccountId: '${provider.toLowerCase()}_account',
+      );
+      
+      // Update wallet balance
+      final newBalance = _wallet!.balance + amount;
+      _wallet = _wallet!.copyWith(balance: newBalance);
+      
+      // Update shared preferences
+      final prefs = await SharedPreferences.getInstance();
+      await prefs.setDouble(Constants.keyWalletBalance, newBalance);
+      
+      // Add transaction to history
+      _transactions.insert(0, newTransaction);
+      
+      _setLoading(false);
+      notifyListeners();
+      return true;
+    } catch (e) {
+      _setError('Failed to process deposit: ${e.toString()}');
+      return false;
+    }
+  }
+
   // Helper methods for state management
   void _setLoading(bool loading) {
     _isLoading = loading;

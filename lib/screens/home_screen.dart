@@ -9,6 +9,7 @@ import '../widgets/address_card.dart';
 import '../widgets/transaction_item.dart';
 import '../widgets/app_drawer.dart';
 import '../utils/constants.dart';
+import 'wave_payment_screen.dart';
 
 class HomeScreen extends StatefulWidget {
   const HomeScreen({super.key});
@@ -429,12 +430,28 @@ class _HomeScreenState extends State<HomeScreen> {
   }
 
   void _handleDepositMethod(String method) {
-    // TODO: Implémenter la logique de dépôt pour chaque méthode
-    ScaffoldMessenger.of(context).showSnackBar(
-      SnackBar(
-        content: Text('Dépôt via $method sélectionné'),
-        backgroundColor: AppTheme.bitcoinOrange,
-      ),
-    );
+    if (method == 'Wave') {
+      Navigator.push(
+        context,
+        MaterialPageRoute(
+          builder: (context) => const WavePaymentScreen(),
+        ),
+      ).then((result) {
+        // Rafraîchir les données si le dépôt a réussi
+        if (result == true) {
+          setState(() {
+            // Déclencher un rebuild pour mettre à jour l'affichage
+          });
+        }
+      });
+    } else {
+      // TODO: Implémenter la logique de dépôt pour les autres méthodes
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text('Dépôt via $method sélectionné'),
+          backgroundColor: AppTheme.bitcoinOrange,
+        ),
+      );
+    }
   }
 }
