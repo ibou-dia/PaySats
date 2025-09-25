@@ -11,35 +11,40 @@ class OnboardingScreen extends StatefulWidget {
 class _OnboardingScreenState extends State<OnboardingScreen> {
   final PageController _pageController = PageController();
   int _currentPage = 0;
-  
+
   final List<OnboardingPage> _pages = [
     OnboardingPage(
       title: 'Bienvenue sur PaySats',
-      description: 'Votre super wallet qui relie Bitcoin et Mobile Money pour l\'Afrique de l\'Ouest.',
+      description:
+          'Votre super wallet qui relie Bitcoin et Mobile Money pour l\'Afrique de l\'Ouest.',
       image: 'assets/images/onboarding_1.png',
       imageIcon: Icons.account_balance_wallet,
     ),
     OnboardingPage(
       title: 'Qu\'est-ce que PaySats?',
-      description: 'PaySats combine Bitcoin, Mobile Money, épargne et investissement dans une seule application simple et sécurisée.',
+      description:
+          'PaySats combine Bitcoin, Mobile Money, épargne et investissement dans une seule application simple et sécurisée.',
       image: 'assets/images/onboarding_2.png',
       imageIcon: Icons.currency_bitcoin,
     ),
     OnboardingPage(
       title: 'Sécurité Avancée',
-      description: 'Votre wallet Bitcoin est protégé par une phrase de récupération et un code PIN. Vos clés privées restent toujours sous votre contrôle.',
+      description:
+          'Votre wallet Bitcoin est protégé par une phrase de récupération et un code PIN. Vos clés privées restent toujours sous votre contrôle.',
       image: 'assets/images/onboarding_3.png',
       imageIcon: Icons.security,
     ),
     OnboardingPage(
       title: 'Authentification Sécurisée',
-      description: 'Créez votre compte avec votre numéro de téléphone, sauvegardez votre phrase de récupération et configurez votre PIN de sécurité.',
+      description:
+          'Créez votre compte avec votre numéro de téléphone, sauvegardez votre phrase de récupération et configurez votre PIN de sécurité.',
       image: 'assets/images/onboarding_auth.png',
       imageIcon: Icons.verified_user,
     ),
     OnboardingPage(
       title: 'Commencez Maintenant',
-      description: 'Gérez vos paiements, épargne et investissements facilement. Envoyez, recevez et suivez vos transactions.',
+      description:
+          'Gérez vos paiements, épargne et investissements facilement. Envoyez, recevez et suivez vos transactions.',
       image: 'assets/images/onboarding_4.png',
       imageIcon: Icons.rocket_launch,
     ),
@@ -88,7 +93,7 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
                 ),
               ),
             ),
-            
+
             // Page view
             Expanded(
               child: PageView.builder(
@@ -104,7 +109,7 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
                 },
               ),
             ),
-            
+
             // Navigation controls
             Padding(
               padding: const EdgeInsets.all(24),
@@ -120,24 +125,30 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
                         height: 10,
                         decoration: BoxDecoration(
                           shape: BoxShape.circle,
-                          color: index == _currentPage
-                              ? AppTheme.bitcoinOrange
-                              : AppTheme.textSecondary.withOpacity(0.3),
+                          color:
+                              index == _currentPage
+                                  ? AppTheme.bitcoinOrange
+                                  : AppTheme.textSecondary.withOpacity(0.3),
                         ),
                       ),
                     ),
                   ),
-                  
+
                   const Spacer(),
-                  
+
                   // Next/Finish button
                   ElevatedButton(
                     onPressed: _nextPage,
                     style: ElevatedButton.styleFrom(
-                      padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 12),
+                      padding: const EdgeInsets.symmetric(
+                        horizontal: 24,
+                        vertical: 12,
+                      ),
                     ),
                     child: Text(
-                      _currentPage == _pages.length - 1 ? 'Créer mon compte' : 'Suivant',
+                      _currentPage == _pages.length - 1
+                          ? 'Commencer'
+                          : 'Suivant',
                     ),
                   ),
                 ],
@@ -158,57 +169,57 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
           // Image or icon
           page.image != null
               ? Image.asset(
-                  page.image!,
-                  height: 200,
-                  fit: BoxFit.contain,
-                  errorBuilder: (context, error, stackTrace) {
-                    // Fallback to icon if image is not found
-                    return Container(
-                      width: 150,
-                      height: 150,
-                      decoration: BoxDecoration(
-                        color: AppTheme.bitcoinOrange.withOpacity(0.1),
-                        shape: BoxShape.circle,
-                      ),
-                      child: Icon(
-                        page.imageIcon ?? Icons.monetization_on,
-                        size: 80,
-                        color: AppTheme.bitcoinOrange,
-                      ),
-                    );
-                  },
-                )
+                page.image!,
+                height: 200,
+                fit: BoxFit.contain,
+                errorBuilder: (context, error, stackTrace) {
+                  // Fallback to icon if image is not found
+                  return Container(
+                    width: 150,
+                    height: 150,
+                    decoration: BoxDecoration(
+                      color: AppTheme.bitcoinOrange.withOpacity(0.1),
+                      shape: BoxShape.circle,
+                    ),
+                    child: Icon(
+                      page.imageIcon ?? Icons.monetization_on,
+                      size: 80,
+                      color: AppTheme.bitcoinOrange,
+                    ),
+                  );
+                },
+              )
               : Container(
-                  width: 150,
-                  height: 150,
-                  decoration: BoxDecoration(
-                    color: AppTheme.bitcoinOrange.withOpacity(0.1),
-                    shape: BoxShape.circle,
-                  ),
-                  child: Icon(
-                    page.imageIcon ?? Icons.monetization_on,
-                    size: 80,
-                    color: AppTheme.bitcoinOrange,
-                  ),
+                width: 150,
+                height: 150,
+                decoration: BoxDecoration(
+                  color: AppTheme.bitcoinOrange.withOpacity(0.1),
+                  shape: BoxShape.circle,
                 ),
-          
+                child: Icon(
+                  page.imageIcon ?? Icons.monetization_on,
+                  size: 80,
+                  color: AppTheme.bitcoinOrange,
+                ),
+              ),
+
           const SizedBox(height: 48),
-          
+
           // Title
           Text(
             page.title,
             style: Theme.of(context).textTheme.headlineMedium,
             textAlign: TextAlign.center,
           ),
-          
+
           const SizedBox(height: 16),
-          
+
           // Description
           Text(
             page.description,
-            style: Theme.of(context).textTheme.bodyLarge?.copyWith(
-                  color: AppTheme.textSecondary,
-                ),
+            style: Theme.of(
+              context,
+            ).textTheme.bodyLarge?.copyWith(color: AppTheme.textSecondary),
             textAlign: TextAlign.center,
           ),
         ],
