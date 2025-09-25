@@ -42,7 +42,7 @@ class _TransactionsScreenState extends State<TransactionsScreen> {
 
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Transaction History'),
+        title: const Text('Historique des Transactions'),
         leading: IconButton(
           icon: const Icon(Icons.arrow_back_ios),
           onPressed: () => Navigator.pop(context),
@@ -58,7 +58,7 @@ class _TransactionsScreenState extends State<TransactionsScreen> {
                 // Search bar
                 TextField(
                   decoration: InputDecoration(
-                    hintText: 'Search by address or hash',
+                    hintText: 'Rechercher par adresse ou hash',
                     prefixIcon: const Icon(Icons.search),
                     suffixIcon: _searchQuery.isNotEmpty
                         ? IconButton(
@@ -86,7 +86,7 @@ class _TransactionsScreenState extends State<TransactionsScreen> {
                   child: Row(
                     children: [
                       _buildFilterChip(
-                        label: 'All',
+                        label: 'Tous',
                         selected: _filterType == null,
                         onSelected: (selected) {
                           setState(() {
@@ -136,8 +136,8 @@ class _TransactionsScreenState extends State<TransactionsScreen> {
                         const SizedBox(height: 16),
                         Text(
                           _searchQuery.isNotEmpty || _filterType != null
-                              ? 'No transactions match your filter'
-                              : 'No transactions yet',
+                              ? 'Aucune transaction ne correspond à votre filtre'
+                              : 'Aucune transaction pour le moment',
                           style: Theme.of(context).textTheme.titleMedium?.copyWith(
                                 color: AppTheme.textSecondary,
                               ),
@@ -150,7 +150,7 @@ class _TransactionsScreenState extends State<TransactionsScreen> {
                                 _filterType = null;
                               });
                             },
-                            child: const Text('Clear filters'),
+                            child: const Text('Effacer les filtres'),
                           ),
                       ],
                     ),
@@ -300,7 +300,7 @@ class _TransactionsScreenState extends State<TransactionsScreen> {
                   width: double.infinity,
                   child: OutlinedButton.icon(
                     icon: const Icon(Icons.open_in_new),
-                    label: const Text('View on Stacks Explorer'),
+                    label: const Text('Voir sur Stacks Explorer'),
                     onPressed: () {
                       // TODO: Open transaction in Stacks Explorer
                       Navigator.pop(context);
