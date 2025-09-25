@@ -151,7 +151,9 @@ class OtpService extends ChangeNotifier {
     if (request == null) return 0;
 
     final remaining = request.expiresAt.difference(DateTime.now());
-    return remaining.inSeconds.clamp(0, double.infinity).toInt();
+    final seconds = remaining.inSeconds.clamp(0, double.infinity);
+    if (seconds.isNaN || seconds.isInfinite) return 0;
+    return seconds.toInt();
   }
 
   /// Obtient le temps restant avant pouvoir renvoyer (en secondes)
@@ -161,7 +163,9 @@ class OtpService extends ChangeNotifier {
 
     final nextAllowed = lastRequest.add(const Duration(minutes: 1));
     final remaining = nextAllowed.difference(DateTime.now());
-    return remaining.inSeconds.clamp(0, double.infinity).toInt();
+    final seconds = remaining.inSeconds.clamp(0, double.infinity);
+    if (seconds.isNaN || seconds.isInfinite) return 0;
+    return seconds.toInt();
   }
 
   /// Nettoie les demandes expirées

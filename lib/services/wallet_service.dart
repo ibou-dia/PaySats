@@ -3,6 +3,7 @@ import 'package:shared_preferences/shared_preferences.dart';
 import '../models/wallet.dart';
 import '../models/transaction.dart';
 import '../utils/constants.dart';
+import 'currency_service.dart';
 
 // Note: We removed flutter_secure_storage dependency due to Android SDK platform issues
 // and we're now using only shared_preferences for storage
@@ -197,15 +198,116 @@ class WalletService extends ChangeNotifier {
 
   // Add deposit transaction and update balance
   Future<bool> addDeposit(double amount, String provider) async {
-    if (_wallet == null || amount <= 0) return false;
+    print('🔵 [DEBUG] addDeposit appelé avec: amount=$amount, provider=$provider');
+    
+    if (_wallet == null) {
+      print('🔴 [ERROR] Wallet non initialisé');
+      _setError('Wallet non initialisé');
+      return false;
+    }
+    
+    if (amount <= 0) {
+      print('🔴 [ERROR] Montant invalide: $amount');
+      _setError('Montant invalide: $amount');
+      return false;
+    }
+    
+    print('🔵 [DEBUG] Wallet actuel: balance=${_wallet!.balance}, address=${_wallet!.address}');
     
     _setLoading(true);
     _clearError();
     
     try {
+      print('🔵 [DEBUG] Début du traitement du dépôt...');
+      
       // Simulate deposit processing
       await Future.delayed(const Duration(seconds: 2));
       
+      print('🔵 [DEBUG] Initialisation du CurrencyService...');
+      
+      // For mobile money deposits, we need to convert the fiat amount to SATS
+      // using the current Bitcoin exchange rate from CurrencyService to maintain consistency
+      // Get current XOF to BTC rate from CurrencyService
+      final currencyService = CurrencyService();
+      
+      print('🔵 [DEBUG] Récupération des taux de change...');
+      
+      // Vérifier si les taux sont déjà chargés
+      if (currencyService.exchangeRates['XOF'] == 0.0 || currencyService.exchangeRates.isEmpty) {
+        print('🔵 [DEBUG] Taux non chargés, récupération en cours...');
+        await currencyService.fetchExchangeRates(); // Ensure we have the latest rates
+        
+        // Attendre un peu pour s'assurer que les taux sont mis à jour
+        await Future.delayed(const Duration(milliseconds: 200));
+      } else {
+        print('🔵 [DEBUG] Taux déjà disponibles');
+      }
+      
+      print('🔵 [DEBUG] Taux de change récupérés: ${currencyService.exchangeRates}');
+      
+      // Utiliser les taux actuels ou les taux de secours
+      double xofPerBtc = currencyService.exchangeRates['XOF'] ?? 0.0;
+      
+      // Si les taux sont toujours à zéro, utiliser les taux de secours
+      if (xofPerBtc <= 0.0) {
+        print('🟡 [WARNING] Utilisation des taux de secours car taux API = $xofPerBtc');
+        xofPerBtc = 32797850.0; // Taux de secours: 1 BTC = 32,797,850 XOF
+      }
+      
+      print('🔵 [DEBUG] Taux XOF/BTC utilisé: $xofPerBtc');
+      
+      // Validate exchange rate
+      if (xofPerBtc <= 0) {
+        print('🔴 [ERROR] Taux de change trop faible: $xofPerBtc');
+        _setError('Taux de change invalide: $xofPerBtc (trop faible)');
+        return false;
+      }
+      
+      if (xofPerBtc.isNaN) {
+        print('🔴 [ERROR] Taux de change NaN');
+        _setError('Taux de change invalide: NaN');
+        return false;
+      }
+      
+      if (xofPerBtc.isInfinite) {
+        print('🔴 [ERROR] Taux de change Infinity');
+        _setError('Taux de change invalide: Infinity');
+        return false;
+      }
+      
+      print('🔵 [DEBUG] Calcul de la conversion...');
+      final btcAmount = amount / xofPerBtc; // Convert XOF to BTC
+      print('🔵 [DEBUG] Montant BTC calculé: $btcAmount');
+      
+      final satsEquivalent = btcAmount * 100000000; // Convert BTC to SATS
+      print('🔵 [DEBUG] Équivalent SATS calculé: $satsEquivalent');
+      
+      // Validate conversion results
+      if (btcAmount.isNaN) {
+        print('🔴 [ERROR] Conversion BTC NaN: amount=$amount, xofPerBtc=$xofPerBtc');
+        _setError('Erreur de conversion BTC: NaN (amount: $amount, xofPerBtc: $xofPerBtc)');
+        return false;
+      }
+      
+      if (btcAmount.isInfinite) {
+        print('🔴 [ERROR] Conversion BTC Infinity: amount=$amount, xofPerBtc=$xofPerBtc');
+        _setError('Erreur de conversion BTC: Infinity (amount: $amount, xofPerBtc: $xofPerBtc)');
+        return false;
+      }
+      
+      if (satsEquivalent.isNaN) {
+        print('🔴 [ERROR] Conversion SATS NaN: btcAmount=$btcAmount');
+        _setError('Erreur de conversion SATS: NaN (btcAmount: $btcAmount)');
+        return false;
+      }
+      
+      if (satsEquivalent.isInfinite) {
+        print('🔴 [ERROR] Conversion SATS Infinity: btcAmount=$btcAmount');
+        _setError('Erreur de conversion SATS: Infinity (btcAmount: $btcAmount)');
+        return false;
+      }
+      
+      print('🔵 [DEBUG] Création de la transaction...');
       // Create new deposit transaction
       final newTransaction = Transaction(
         id: DateTime.now().millisecondsSinceEpoch.toString(),
@@ -215,31 +317,59 @@ class WalletService extends ChangeNotifier {
         category: TransactionCategory.payment,
         amount: amount,
         currency: 'XOF',
-        fromAccount: '$provider - Dépôt',
-        toAccount: 'Wallet PaySats',
+        fromAccount: '$provider - 77 474 88 87',
+        toAccount: 'Wave',
         timestamp: DateTime.now(),
         completedAt: DateTime.now(),
         description: 'Dépôt via $provider',
         mobileMoneyAccountId: '${provider.toLowerCase()}_account',
       );
       
-      // Update wallet balance
-      final newBalance = _wallet!.balance + amount;
+      print('🔵 [DEBUG] Transaction créée: ${newTransaction.id}');
+      
+      // Update wallet balance with SATS equivalent
+      print('🔵 [DEBUG] Calcul du nouveau solde: ${_wallet!.balance} + $satsEquivalent');
+      final newBalance = _wallet!.balance + satsEquivalent;
+      print('🔵 [DEBUG] Nouveau solde calculé: $newBalance');
+      
+      // Validate new balance
+      if (newBalance.isNaN) {
+        print('🔴 [ERROR] Nouveau solde NaN: balance=${_wallet!.balance}, satsEquivalent=$satsEquivalent');
+        _setError('Erreur de calcul du solde: NaN (balance actuel: ${_wallet!.balance}, satsEquivalent: $satsEquivalent)');
+        return false;
+      }
+      
+      if (newBalance.isInfinite) {
+        print('🔴 [ERROR] Nouveau solde Infinity: balance=${_wallet!.balance}, satsEquivalent=$satsEquivalent');
+        _setError('Erreur de calcul du solde: Infinity (balance actuel: ${_wallet!.balance}, satsEquivalent: $satsEquivalent)');
+        return false;
+      }
+      
+      print('🔵 [DEBUG] Mise à jour du wallet...');
       _wallet = _wallet!.copyWith(balance: newBalance);
       
+      print('🔵 [DEBUG] Sauvegarde dans SharedPreferences...');
       // Update shared preferences
       final prefs = await SharedPreferences.getInstance();
       await prefs.setDouble(Constants.keyWalletBalance, newBalance);
       
-      // Add transaction to history
+      print('🔵 [DEBUG] Ajout de la transaction à l\'historique...');
       _transactions.insert(0, newTransaction);
+      
+      print('🟢 [SUCCESS] Dépôt traité avec succès!');
+      print('🔵 [DEBUG] Nouveau solde final: ${_wallet!.balance}');
+      print('🔵 [DEBUG] Nombre de transactions: ${_transactions.length}');
       
       _setLoading(false);
       notifyListeners();
       return true;
     } catch (e) {
+      print('🔴 [ERROR] Exception dans addDeposit: ${e.toString()}');
+      print('🔴 [ERROR] Stack trace: ${e.runtimeType}');
       _setError('Failed to process deposit: ${e.toString()}');
       return false;
+    } finally {
+      print('🔵 [DEBUG] Fin de addDeposit');
     }
   }
 

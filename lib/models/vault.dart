@@ -206,8 +206,10 @@ class Vault {
 
   // Get progress percentage
   double get progressPercentage {
-    if (targetAmount == null || targetAmount! <= 0) return 0.0;
-    return (currentAmount / targetAmount!) * 100;
+    if (targetAmount == null || targetAmount! <= 0 || currentAmount.isNaN || currentAmount.isInfinite) return 0.0;
+    final result = (currentAmount / targetAmount!) * 100;
+    if (result.isNaN || result.isInfinite) return 0.0;
+    return result;
   }
 
   // Get remaining amount to reach target

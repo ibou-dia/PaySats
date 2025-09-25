@@ -3,8 +3,9 @@ import 'package:flutter/services.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import '../theme/app_theme.dart';
 import '../services/wallet_service.dart';
-import '../models/transaction.dart';
-import '../utils/constants.dart';
+import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
+import '../services/wallet_service.dart';
 
 class WavePaymentScreen extends StatefulWidget {
   const WavePaymentScreen({super.key});
@@ -15,7 +16,6 @@ class WavePaymentScreen extends StatefulWidget {
 
 class _WavePaymentScreenState extends State<WavePaymentScreen> {
   final TextEditingController _amountController = TextEditingController();
-  final WalletService _walletService = WalletService();
   bool _isLoading = false;
 
   @override
@@ -165,19 +165,34 @@ class _WavePaymentScreenState extends State<WavePaymentScreen> {
   }
 
   Future<void> _confirmPayment(double amount) async {
+    print('🔵 [DEBUG] _confirmPayment appelé avec amount: $amount');
+    
+    final walletService = Provider.of<WalletService>(context, listen: false);
+    
+    print('🔵 [DEBUG] WalletService récupéré: ${walletService != null}');
+    print('🔵 [DEBUG] Wallet connecté: ${walletService.isConnected}');
+    print('🔵 [DEBUG] Wallet actuel: ${walletService.wallet?.address}');
+    
     setState(() {
       _isLoading = true;
     });
 
     try {
+      print('🔵 [DEBUG] Début du traitement du paiement Wave...');
+      
       // Simuler le traitement du paiement Wave
       await Future.delayed(const Duration(seconds: 1));
 
+      print('🔵 [DEBUG] Appel de walletService.addDeposit...');
       // Traiter le dépôt via le WalletService
-      final success = await _walletService.addDeposit(amount, 'Wave');
+      final success = await walletService.addDeposit(amount, 'Wave');
+
+      print('🔵 [DEBUG] Résultat addDeposit: $success');
+      print('🔵 [DEBUG] Erreur WalletService: ${walletService.error}');
 
       if (mounted) {
         if (success) {
+          print('🟢 [SUCCESS] Dépôt réussi dans l\'interface');
           ScaffoldMessenger.of(context).showSnackBar(
             SnackBar(
               content: Text('Dépôt de ${amount.toStringAsFixed(0)}F réussi !'),
@@ -188,15 +203,22 @@ class _WavePaymentScreenState extends State<WavePaymentScreen> {
           // Retourner à l'écran précédent
           Navigator.of(context).pop(true);
         } else {
+          print('🔴 [ERROR] Échec du dépôt dans l\'interface');
+          final errorMessage = walletService.error ?? 'Erreur inconnue';
+          print('🔴 [ERROR] Message d\'erreur: $errorMessage');
+          
           ScaffoldMessenger.of(context).showSnackBar(
-            const SnackBar(
-              content: Text('Erreur lors du dépôt'),
+            SnackBar(
+              content: Text('Erreur lors du dépôt: $errorMessage'),
               backgroundColor: Colors.red,
             ),
           );
         }
       }
     } catch (e) {
+      print('🔴 [ERROR] Exception dans _confirmPayment: ${e.toString()}');
+      print('🔴 [ERROR] Type d\'exception: ${e.runtimeType}');
+      
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
@@ -206,6 +228,7 @@ class _WavePaymentScreenState extends State<WavePaymentScreen> {
         );
       }
     } finally {
+      print('🔵 [DEBUG] Fin de _confirmPayment');
       if (mounted) {
         setState(() {
           _isLoading = false;
@@ -258,7 +281,7 @@ class _WavePaymentScreenState extends State<WavePaymentScreen> {
                 ),
                 const SizedBox(width: 14),
                 const Text(
-                  'Wallet PaySats',
+                  'Wave',
                   style: TextStyle(fontSize: 16, color: Colors.black),
                 ),
               ],

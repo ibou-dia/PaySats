@@ -314,6 +314,12 @@ class Transaction {
     final sign = isOutgoing ? '-' : '+';
     // Format amount with appropriate decimal places, removing trailing zeros
     String formattedValue;
+    
+    // Check for invalid values
+    if (amount.isNaN || amount.isInfinite) {
+      return '${sign}0.00 $currency';
+    }
+    
     if (currency == 'BTC' || currency == 'SATS') {
       // For Bitcoin/SATS, use formatBitcoin to remove trailing zeros
       formattedValue = amount.toStringAsFixed(8).replaceAll(RegExp(r'([.]*0+)$'), '');
@@ -326,6 +332,12 @@ class Transaction {
 
   String get formattedFees {
     if (fees == null) return '';
+    
+    // Check for invalid values
+    if (fees!.isNaN || fees!.isInfinite) {
+      return '0.00 $currency';
+    }
+    
     // Format fees with appropriate decimal places, removing trailing zeros
     String formattedValue;
     if (currency == 'BTC' || currency == 'SATS') {

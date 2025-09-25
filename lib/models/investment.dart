@@ -306,6 +306,9 @@ class Investment {
 
   // Get formatted gain/loss percentage
   String get formattedGainLossPercentage {
+    if (gainLossPercentage.isNaN || gainLossPercentage.isInfinite) {
+      return '0.00%';
+    }
     final sign = gainLossPercentage >= 0 ? '+' : '';
     return '$sign${gainLossPercentage.toStringAsFixed(2)}%';
   }
@@ -317,8 +320,10 @@ class Investment {
 
   // Get current price per unit
   double get currentPrice {
-    if (quantity <= 0) return 0.0;
-    return currentValue / quantity;
+    if (quantity <= 0 || currentValue.isNaN || currentValue.isInfinite) return 0.0;
+    final result = currentValue / quantity;
+    if (result.isNaN || result.isInfinite) return 0.0;
+    return result;
   }
 
   // Get risk level color

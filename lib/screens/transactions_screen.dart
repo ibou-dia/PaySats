@@ -199,12 +199,25 @@ class _TransactionsScreenState extends State<TransactionsScreen> {
     if (transaction.fromAddress != null && transaction.fromAddress!.isNotEmpty) {
       return transaction.fromAddress!;
     }
-    if (transaction.toAccount != null && transaction.toAccount!.isNotEmpty) {
-      return transaction.toAccount!;
+    
+    // For incoming transactions (deposits), prioritize fromAccount to show the sender
+    if (transaction.isIncoming) {
+      if (transaction.fromAccount != null && transaction.fromAccount!.isNotEmpty) {
+        return transaction.fromAccount!;
+      }
+      if (transaction.toAccount != null && transaction.toAccount!.isNotEmpty) {
+        return transaction.toAccount!;
+      }
+    } else {
+      // For outgoing transactions, prioritize toAccount to show the recipient
+      if (transaction.toAccount != null && transaction.toAccount!.isNotEmpty) {
+        return transaction.toAccount!;
+      }
+      if (transaction.fromAccount != null && transaction.fromAccount!.isNotEmpty) {
+        return transaction.fromAccount!;
+      }
     }
-    if (transaction.fromAccount != null && transaction.fromAccount!.isNotEmpty) {
-      return transaction.fromAccount!;
-    }
+    
     return transaction.description ?? 'Adresse inconnue';
   }
 

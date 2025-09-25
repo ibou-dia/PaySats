@@ -270,17 +270,26 @@ class LightningPayment {
 
   // Get amount in Bitcoin
   double get amountBTC {
-    return amountSats / 100000000; // 1 BTC = 100,000,000 sats
+    if (amountSats.isNaN || amountSats.isInfinite) return 0.0;
+    final result = amountSats / 100000000; // 1 BTC = 100,000,000 sats
+    if (result.isNaN || result.isInfinite) return 0.0;
+    return result;
   }
 
   // Get fees in Bitcoin
   double get feesBTC {
-    if (feesSats == null) return 0.0;
-    return feesSats! / 100000000;
+    if (feesSats == null || feesSats!.isNaN || feesSats!.isInfinite) return 0.0;
+    final result = feesSats! / 100000000;
+    if (result.isNaN || result.isInfinite) return 0.0;
+    return result;
   }
 
   // Get formatted amount
   String get formattedAmount {
+    if (amountSats.isNaN || amountSats.isInfinite) {
+      return '0 sats';
+    }
+    
     if (amountSats >= 1000000) {
       return '${(amountSats / 1000000).toStringAsFixed(2)}M sats';
     } else if (amountSats >= 1000) {
@@ -291,7 +300,7 @@ class LightningPayment {
 
   // Get formatted fees
   String get formattedFees {
-    if (feesSats == null) return '0 sats';
+    if (feesSats == null || feesSats!.isNaN || feesSats!.isInfinite) return '0 sats';
     return '${feesSats!.toInt()} sats';
   }
 

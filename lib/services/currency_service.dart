@@ -7,6 +7,13 @@ class CurrencyService extends ChangeNotifier {
   static const String _priceApiUrl = 'https://api.coingecko.com/api/v3/simple/price?ids=bitcoin&vs_currencies=usd,eur,gbp,jpy,cad,aud,chf,xof';
   static const String _prefKeyCurrency = 'selected_currency';
   
+  // Singleton pattern
+  static CurrencyService? _instance;
+  static CurrencyService get instance {
+    _instance ??= CurrencyService._internal();
+    return _instance!;
+  }
+  
   Map<String, double> _exchangeRates = {
     'USD': 0.0,
     'EUR': 0.0,
@@ -23,9 +30,14 @@ class CurrencyService extends ChangeNotifier {
   String? _error;
   DateTime? _lastUpdated;
   
-  CurrencyService() {
+  CurrencyService._internal() {
     _loadSelectedCurrency();
     fetchExchangeRates();
+  }
+  
+  // Factory constructor pour maintenir la compatibilité
+  factory CurrencyService() {
+    return instance;
   }
   
   // Getters
@@ -71,18 +83,43 @@ class CurrencyService extends ChangeNotifier {
   // Convert from Satoshis to fiat
   double satsToFiat(double satsAmount) {
     final rate = _exchangeRates[_selectedCurrency] ?? 0.0;
+    
+    // Check for invalid inputs
+    if (satsAmount.isNaN || satsAmount.isInfinite || rate <= 0) {
+      return 0.0;
+    }
+    
     // Convert sats to BTC first (1 BTC = 100,000,000 sats), then to fiat
     final btcAmount = satsAmount / 100000000;
-    return btcAmount * rate;
+    final result = btcAmount * rate;
+    
+    // Check for invalid result
+    if (result.isNaN || result.isInfinite) {
+      return 0.0;
+    }
+    
+    return result;
   }
   
   // Convert from fiat to Satoshis
   double fiatToSats(double fiatAmount) {
     final rate = _exchangeRates[_selectedCurrency] ?? 0.0;
-    if (rate <= 0) return 0.0;
+    
+    // Check for invalid inputs
+    if (fiatAmount.isNaN || fiatAmount.isInfinite || rate <= 0) {
+      return 0.0;
+    }
+    
     // Convert fiat to BTC first, then to sats
     final btcAmount = fiatAmount / rate;
-    return btcAmount * 100000000;
+    final result = btcAmount * 100000000;
+    
+    // Check for invalid result
+    if (result.isNaN || result.isInfinite) {
+      return 0.0;
+    }
+    
+    return result;
   }
 
   // Convert from Bitcoin to fiat (kept for backward compatibility)
@@ -131,19 +168,28 @@ class CurrencyService extends ChangeNotifier {
   
   // Fetch exchange rates from API
   Future<void> fetchExchangeRates() async {
+    print('🔵 [DEBUG] fetchExchangeRates appelé');
+    
     if (_isLoading) return;
     
     _setLoading(true);
     _clearError();
     
     try {
+      print('🔵 [DEBUG] Tentative de récupération des taux depuis: $_priceApiUrl');
+      
       final response = await http.get(Uri.parse(_priceApiUrl));
+      
+      print('🔵 [DEBUG] Code de réponse HTTP: ${response.statusCode}');
+      print('🔵 [DEBUG] Taille de la réponse: ${response.body.length} caractères');
       
       if (response.statusCode == 200) {
         final data = jsonDecode(response.body);
+        print('🔵 [DEBUG] Données JSON décodées: ${data.keys.toList()}');
         
         if (data.containsKey('bitcoin')) {
           final bitcoin = data['bitcoin'];
+          print('🔵 [DEBUG] Données Bitcoin trouvées: ${bitcoin.keys.toList()}');
           
           // Update exchange rates
           _exchangeRates = {
@@ -157,37 +203,58 @@ class CurrencyService extends ChangeNotifier {
             'XOF': 0.0, // Will be calculated from USD rate
           };
           
-          // Calculate XOF rate from USD (1 USD ≈ 558.62 XOF as of current rates)
+          // Calculate XOF rate from USD (1 USD ≈ 655.957 XOF)
           final usdRate = _exchangeRates['USD'] ?? 0.0;
           if (usdRate > 0) {
-            _exchangeRates['XOF'] = usdRate * 558.62; // USD to XOF conversion
+            final xofRate = usdRate * 655.957; // USD to XOF conversion
+            _exchangeRates['XOF'] = xofRate;
+            print('🔵 [DEBUG] Taux USD trouvé: $usdRate');
+            print('🔵 [DEBUG] Taux XOF calculé: $xofRate');
+          } else {
+            print('🔴 [ERROR] Taux USD non trouvé ou invalide');
           }
           
           _lastUpdated = DateTime.now();
+          print('🟢 [SUCCESS] Taux de change mis à jour avec succès');
+          print('🔵 [DEBUG] Nombre de taux: ${_exchangeRates.length}');
+          print('🔵 [DEBUG] Taux BTC/XOF: ${_exchangeRates['XOF']}');
         } else {
+          print('🔴 [ERROR] Données Bitcoin non trouvées dans la réponse');
           _setError('Bitcoin data not found in response');
         }
       } else {
+        print('🔴 [ERROR] Échec de l\'API: ${response.statusCode}');
+        print('🔴 [ERROR] Corps de la réponse: ${response.body}');
         _setError('Failed to fetch exchange rates: ${response.statusCode}');
       }
     } catch (e) {
+      print('🔴 [ERROR] Exception dans fetchExchangeRates: ${e.toString()}');
+      print('🔴 [ERROR] Type d\'exception: ${e.runtimeType}');
+      
       _setError('Error fetching exchange rates: ${e.toString()}');
       
       // Use fallback rates if API call fails
+      print('🟡 [WARNING] Utilisation des taux de secours');
       if (_exchangeRates['USD'] == 0.0) {
         _exchangeRates = {
-          'USD': 66000.0, // Fallback rates as of May 2025
-          'EUR': 60500.0,
-          'GBP': 52000.0,
-          'JPY': 9900000.0,
-          'CAD': 88000.0,
-          'AUD': 97000.0,
-          'CHF': 58000.0,
-          'XOF': 36869320.0, // FCFA fallback rate (66000 * 558.62)
+          'USD': 50000.0, // 1 BTC = 50,000 USD
+          'EUR': 45000.0, // 1 BTC = 45,000 EUR
+          'GBP': 40000.0,
+          'JPY': 7500000.0,
+          'CAD': 67500.0,
+          'AUD': 75000.0,
+          'CHF': 45000.0,
+          'XOF': 32797850.0, // 1 BTC = 32,797,850 XOF (50,000 * 655.957)
         };
+        
+        print('🔵 [DEBUG] Taux de secours appliqués:');
+        _exchangeRates.forEach((currency, rate) {
+          print('🔵 [DEBUG] $currency: $rate');
+        });
       }
     } finally {
       _setLoading(false);
+      print('🔵 [DEBUG] Fin de fetchExchangeRates');
     }
   }
   

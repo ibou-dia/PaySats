@@ -14,6 +14,11 @@ class Formatters {
 
   /// Formats a Satoshi amount with proper formatting
   static String formatSats(double amount) {
+    // Check for invalid values (NaN, Infinity, negative)
+    if (amount.isNaN || amount.isInfinite || amount < 0) {
+      return '0';
+    }
+    
     // Format sats as whole numbers with thousand separators
     return amount.toInt().toString().replaceAllMapped(
       RegExp(r'(\d{1,3})(?=(\d{3})+(?!\d))'),

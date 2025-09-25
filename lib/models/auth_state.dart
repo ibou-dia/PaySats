@@ -93,7 +93,9 @@ class AuthState {
   int get minutesUntilUnlock {
     if (lockedUntil == null) return 0;
     final diff = lockedUntil!.difference(DateTime.now());
-    return diff.inMinutes.clamp(0, double.infinity).toInt();
+    final minutes = diff.inMinutes.clamp(0, double.infinity);
+    if (minutes.isNaN || minutes.isInfinite) return 0;
+    return minutes.toInt();
   }
 
   /// Crée une copie avec des propriétés modifiées
