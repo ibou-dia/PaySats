@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_svg/flutter_svg.dart';
 import 'package:provider/provider.dart';
 import '../services/wallet_service.dart';
 import '../services/currency_service.dart';
@@ -98,8 +99,8 @@ class _HomeScreenState extends State<HomeScreen> {
                     Text(
                       'Votre Solde',
                       style: Theme.of(context).textTheme.titleMedium?.copyWith(
-                            color: Colors.white.withOpacity(0.8),
-                          ),
+                        color: Colors.white.withOpacity(0.8),
+                      ),
                     ),
                     const SizedBox(height: 8),
                     Text(
@@ -146,18 +147,25 @@ class _HomeScreenState extends State<HomeScreen> {
                   label: 'Envoyer',
                   onTap: () => Navigator.pushNamed(context, '/send'),
                 ),
-                const SizedBox(width: 16),
+                const SizedBox(width: 12),
                 _buildActionButton(
                   context,
                   icon: Icons.arrow_downward_rounded,
                   label: 'Recevoir',
                   onTap: () => Navigator.pushNamed(context, '/receive'),
                 ),
-                const SizedBox(width: 16),
+                const SizedBox(width: 12),
+                _buildActionButton(
+                  context,
+                  icon: Icons.account_balance_wallet_outlined,
+                  label: 'Dépot',
+                  onTap: () => _showDepositOptions(context),
+                ),
+                const SizedBox(width: 12),
                 _buildActionButton(
                   context,
                   icon: Icons.history,
-                  label: 'Historique',
+                  label: 'Récents',
                   onTap: () => Navigator.pushNamed(context, '/transactions'),
                 ),
               ],
@@ -260,6 +268,172 @@ class _HomeScreenState extends State<HomeScreen> {
             ],
           ),
         ),
+      ),
+    );
+  }
+
+  void _showDepositOptions(BuildContext context) {
+    showModalBottomSheet(
+      context: context,
+      backgroundColor: Colors.transparent,
+      builder: (BuildContext context) {
+        return Container(
+          decoration: const BoxDecoration(
+            color: AppTheme.cardBackground,
+            borderRadius: BorderRadius.only(
+              topLeft: Radius.circular(24),
+              topRight: Radius.circular(24),
+            ),
+          ),
+          padding: const EdgeInsets.all(24),
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              // Handle bar
+              Center(
+                child: Container(
+                  width: 40,
+                  height: 4,
+                  decoration: BoxDecoration(
+                    color: AppTheme.textSecondary.withOpacity(0.3),
+                    borderRadius: BorderRadius.circular(2),
+                  ),
+                ),
+              ),
+              const SizedBox(height: 24),
+
+              // Title
+              Text(
+                'Choisir une méthode de dépôt',
+                style: Theme.of(
+                  context,
+                ).textTheme.titleLarge?.copyWith(fontWeight: FontWeight.bold),
+              ),
+              const SizedBox(height: 24),
+
+              // Orange Money Option
+              _buildDepositOption(
+                context,
+                title: 'Orange Money',
+                subtitle: 'Déposer via Orange Money',
+                imagePath: 'assets/images/orange-money-nobg.png',
+                containerColor: const Color.fromARGB(255, 255, 226, 183),
+                onTap: () {
+                  Navigator.pop(context);
+                  _handleDepositMethod('Orange Money');
+                },
+              ),
+
+              const SizedBox(height: 16),
+
+              // Wave Option
+              _buildDepositOption(
+                context,
+                title: 'Wave',
+                subtitle: 'Déposer via Wave',
+                imagePath: 'assets/images/wave-nobg.png',
+                containerColor: Colors.blue.shade100,
+                onTap: () {
+                  Navigator.pop(context);
+                  _handleDepositMethod('Wave');
+                },
+              ),
+
+              const SizedBox(height: 16),
+
+              // Mixx Option
+              _buildDepositOption(
+                context,
+                title: 'Mixx by Yas',
+                subtitle: 'Déposer via Mixx',
+                imagePath: 'assets/images/mixx-by-yas.png',
+                containerColor: const Color(0xFF1A237E), // Bleu nuit
+                onTap: () {
+                  Navigator.pop(context);
+                  _handleDepositMethod('Mixx');
+                },
+              ),
+
+              const SizedBox(height: 24),
+            ],
+          ),
+        );
+      },
+    );
+  }
+
+  Widget _buildDepositOption(
+    BuildContext context, {
+    required String title,
+    required String subtitle,
+    required String imagePath,
+    required Color containerColor,
+    required VoidCallback onTap,
+  }) {
+    return InkWell(
+      onTap: onTap,
+      borderRadius: BorderRadius.circular(16),
+      child: Container(
+        padding: const EdgeInsets.all(16),
+        decoration: BoxDecoration(
+          color: AppTheme.background,
+          borderRadius: BorderRadius.circular(16),
+          border: Border.all(color: AppTheme.textSecondary.withOpacity(0.1)),
+        ),
+        child: Row(
+          children: [
+            Container(
+              padding: const EdgeInsets.all(8),
+              decoration: BoxDecoration(
+                color: containerColor,
+                borderRadius: BorderRadius.circular(12),
+              ),
+              child: Image.asset(
+                imagePath,
+                width: 35,
+                height: 35,
+                fit: BoxFit.contain,
+              ),
+            ),
+            const SizedBox(width: 16),
+            Expanded(
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(
+                    title,
+                    style: Theme.of(context).textTheme.titleMedium?.copyWith(
+                      fontWeight: FontWeight.w600,
+                    ),
+                  ),
+                  const SizedBox(height: 4),
+                  Text(
+                    subtitle,
+                    style: Theme.of(context).textTheme.bodyMedium?.copyWith(
+                      color: AppTheme.textSecondary,
+                    ),
+                  ),
+                ],
+              ),
+            ),
+            Icon(
+              Icons.arrow_forward_ios,
+              color: AppTheme.textSecondary,
+              size: 16,
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+
+  void _handleDepositMethod(String method) {
+    // TODO: Implémenter la logique de dépôt pour chaque méthode
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(
+        content: Text('Dépôt via $method sélectionné'),
+        backgroundColor: AppTheme.bitcoinOrange,
       ),
     );
   }
