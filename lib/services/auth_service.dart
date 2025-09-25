@@ -426,7 +426,7 @@ class AuthService extends ChangeNotifier {
       address: address,
       publicKey: publicKey,
       balance: 0.0,
-      currency: 'BTC',
+      currency: 'SATS',
       isActive: true,
       createdAt: DateTime.now(),
     );

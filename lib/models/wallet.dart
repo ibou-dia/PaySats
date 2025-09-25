@@ -112,8 +112,8 @@ class Wallet {
 
   // Get formatted balance
   String get formattedBalance {
-    if (currency == 'BTC') {
-      return '${balance.toStringAsFixed(8)} BTC';
+    if (currency == 'BTC' || currency == 'SATS') {
+      return '${balance.toStringAsFixed(8).replaceAll(RegExp(r'([.]*0+)$'), '')} $currency';
     }
     return '${balance.toStringAsFixed(2)} $currency';
   }

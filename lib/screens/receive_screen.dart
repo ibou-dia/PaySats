@@ -17,16 +17,14 @@ class ReceiveScreen extends StatelessWidget {
     if (wallet == null) {
       return const Scaffold(
         body: Center(
-          child: CircularProgressIndicator(
-            color: AppTheme.bitcoinOrange,
-          ),
+          child: CircularProgressIndicator(color: AppTheme.bitcoinOrange),
         ),
       );
     }
 
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Receive sBTC'),
+        title: const Text('Recevoir des SATS'),
         leading: IconButton(
           icon: const Icon(Icons.arrow_back_ios),
           onPressed: () => Navigator.pop(context),
@@ -39,19 +37,19 @@ class ReceiveScreen extends StatelessWidget {
             crossAxisAlignment: CrossAxisAlignment.center,
             children: [
               Text(
-                'Your sBTC Address',
+                'Votre Adresse',
                 style: Theme.of(context).textTheme.titleLarge,
               ),
               const SizedBox(height: 8),
               Text(
-                  'Share this address to receive SATS from others',
-                style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-                      color: AppTheme.textSecondary,
-                    ),
+                'Partagez cette adresse pour recevoir des SATS d\'autres personnes',
+                style: Theme.of(
+                  context,
+                ).textTheme.bodyMedium?.copyWith(color: AppTheme.textSecondary),
                 textAlign: TextAlign.center,
               ),
               const SizedBox(height: 32),
-              
+
               // QR Code
               Container(
                 padding: const EdgeInsets.all(16),
@@ -72,15 +70,17 @@ class ReceiveScreen extends StatelessWidget {
                   size: 200,
                   backgroundColor: Colors.white,
                   padding: const EdgeInsets.all(12),
-                  embeddedImage: const AssetImage('assets/images/bitcoin-logo.png'),
+                  embeddedImage: const AssetImage(
+                    'assets/images/bitcoin-logo.png',
+                  ),
                   embeddedImageStyle: const QrEmbeddedImageStyle(
                     size: Size(40, 40),
                   ),
                 ),
               ),
-              
+
               const SizedBox(height: 32),
-              
+
               // Address display
               Container(
                 padding: const EdgeInsets.all(16),
@@ -94,7 +94,11 @@ class ReceiveScreen extends StatelessWidget {
                       children: [
                         Expanded(
                           child: Text(
-                            Formatters.shortenAddress(wallet.address, start: 12, end: 12),
+                            Formatters.shortenAddress(
+                              wallet.address,
+                              start: 12,
+                              end: 12,
+                            ),
                             style: Theme.of(context).textTheme.bodyLarge,
                             textAlign: TextAlign.center,
                           ),
@@ -109,35 +113,36 @@ class ReceiveScreen extends StatelessWidget {
                       onTap: () {
                         showDialog(
                           context: context,
-                          builder: (context) => AlertDialog(
-                            title: const Text('Full Address'),
-                            content: SelectableText(
-                              wallet.address,
-                              style: Theme.of(context).textTheme.bodyMedium,
-                            ),
-                            actions: [
-                              TextButton(
-                                onPressed: () => Navigator.pop(context),
-                                child: const Text('Close'),
+                          builder:
+                              (context) => AlertDialog(
+                                title: const Text('Adresse Complète'),
+                                content: SelectableText(
+                                  wallet.address,
+                                  style: Theme.of(context).textTheme.bodyMedium,
+                                ),
+                                actions: [
+                                  TextButton(
+                                    onPressed: () => Navigator.pop(context),
+                                    child: const Text('Fermer'),
+                                  ),
+                                ],
                               ),
-                            ],
-                          ),
                         );
                       },
                       child: Text(
-                        'Tap to view full address',
+                        'Appuyez pour voir l\'adresse complète',
                         style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-                              color: AppTheme.bitcoinOrange,
-                              fontWeight: FontWeight.w500,
-                            ),
+                          color: AppTheme.bitcoinOrange,
+                          fontWeight: FontWeight.w500,
+                        ),
                       ),
                     ),
                   ],
                 ),
               ),
-              
+
               const SizedBox(height: 24),
-              
+
               // Copy address button
               SizedBox(
                 width: double.infinity,
@@ -146,18 +151,18 @@ class ReceiveScreen extends StatelessWidget {
                     Clipboard.setData(ClipboardData(text: wallet.address));
                     ScaffoldMessenger.of(context).showSnackBar(
                       const SnackBar(
-                        content: Text('Address copied to clipboard'),
+                        content: Text('Adresse copiée dans le presse-papiers'),
                         duration: Duration(seconds: 2),
                       ),
                     );
                   },
                   icon: const Icon(Icons.copy),
-                  label: const Text('Copy Address'),
+                  label: const Text('Copier l\'Adresse'),
                 ),
               ),
-              
+
               const SizedBox(height: 32),
-              
+
               // Information card
               Container(
                 padding: const EdgeInsets.all(16),
@@ -167,14 +172,11 @@ class ReceiveScreen extends StatelessWidget {
                 ),
                 child: Row(
                   children: [
-                    Icon(
-                      Icons.info_outline,
-                      color: Colors.amber[800],
-                    ),
+                    Icon(Icons.info_outline, color: Colors.amber[800]),
                     const SizedBox(width: 12),
                     Expanded(
                       child: Text(
-                        'Only send sBTC to this address. Sending other tokens may result in permanent loss.',
+                        'Envoyez uniquement des SATS à cette adresse. L\'envoi d\'autres tokens peut entraîner une perte permanente.',
                         style: TextStyle(
                           color: Colors.amber[800],
                           fontSize: 14,

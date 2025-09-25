@@ -147,7 +147,7 @@ class WalletService extends ChangeNotifier {
         status: TransactionStatus.completed,
         category: TransactionCategory.payment,
         amount: amount,
-        currency: 'BTC',
+        currency: 'SATS',
         toAddress: toAddress,
         timestamp: DateTime.now(),
         completedAt: DateTime.now(),

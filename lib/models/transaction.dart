@@ -90,7 +90,7 @@ class Transaction {
     this.status = TransactionStatus.completed,
     required this.category,
     required this.amount,
-    this.currency = 'BTC',
+    this.currency = 'SATS',
     this.fees,
     this.fromAddress,
     this.toAddress,
@@ -223,7 +223,7 @@ class Transaction {
         orElse: () => TransactionCategory.payment,
       ),
       amount: json['amount']?.toDouble() ?? 0.0,
-      currency: json['currency'] ?? 'BTC',
+      currency: json['currency'] ?? 'SATS',
       fees: json['fees']?.toDouble(),
       fromAddress: json['fromAddress'],
       toAddress: json['toAddress'],
@@ -312,12 +312,30 @@ class Transaction {
 
   String get formattedAmount {
     final sign = isOutgoing ? '-' : '+';
-    return '$sign${amount.toStringAsFixed(8)} $currency';
+    // Format amount with appropriate decimal places, removing trailing zeros
+    String formattedValue;
+    if (currency == 'BTC' || currency == 'SATS') {
+      // For Bitcoin/SATS, use formatBitcoin to remove trailing zeros
+      formattedValue = amount.toStringAsFixed(8).replaceAll(RegExp(r'([.]*0+)$'), '');
+    } else {
+      // For fiat currencies, use 2 decimal places
+      formattedValue = amount.toStringAsFixed(2);
+    }
+    return '$sign$formattedValue $currency';
   }
 
   String get formattedFees {
     if (fees == null) return '';
-    return '${fees!.toStringAsFixed(8)} $currency';
+    // Format fees with appropriate decimal places, removing trailing zeros
+    String formattedValue;
+    if (currency == 'BTC' || currency == 'SATS') {
+      // For Bitcoin/SATS, remove trailing zeros
+      formattedValue = fees!.toStringAsFixed(8).replaceAll(RegExp(r'([.]*0+)$'), '');
+    } else {
+      // For fiat currencies, use 2 decimal places
+      formattedValue = fees!.toStringAsFixed(2);
+    }
+    return '$formattedValue $currency';
   }
 
   bool get isOutgoing {
