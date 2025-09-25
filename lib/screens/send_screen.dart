@@ -42,15 +42,18 @@ class _SendScreenState extends State<SendScreen> {
   // When SATS amount changes, update the fiat amount
   void _onSatsAmountChanged() {
     if (_inputInFiat) return; // Avoid infinite loop
-    
-    final currencyService = Provider.of<CurrencyService>(context, listen: false);
-    
+
+    final currencyService = Provider.of<CurrencyService>(
+      context,
+      listen: false,
+    );
+
     if (_satsAmountController.text.isEmpty) {
       // Si le champ est vide, vider aussi le champ de devise fiat
       _fiatAmountController.text = '';
       return;
     }
-    
+
     try {
       // Vérifier si la valeur est un nombre valide
       final satsText = _satsAmountController.text;
@@ -58,10 +61,10 @@ class _SendScreenState extends State<SendScreen> {
         _fiatAmountController.text = '0.00';
         return;
       }
-      
+
       final satsAmount = double.parse(satsText);
       final fiatAmount = currencyService.satsToFiat(satsAmount);
-      
+
       // Désactiver temporairement les écouteurs pour éviter les boucles de mise à jour
       _inputInFiat = true;
       _fiatAmountController.text = fiatAmount.toStringAsFixed(2);
@@ -77,15 +80,18 @@ class _SendScreenState extends State<SendScreen> {
   // When fiat amount changes, update the BTC amount
   void _onFiatAmountChanged() {
     if (!_inputInFiat) return; // Avoid infinite loop
-    
-    final currencyService = Provider.of<CurrencyService>(context, listen: false);
-    
+
+    final currencyService = Provider.of<CurrencyService>(
+      context,
+      listen: false,
+    );
+
     if (_fiatAmountController.text.isEmpty) {
       // Si le champ est vide, vider aussi le champ SATS
       _satsAmountController.text = '';
       return;
     }
-    
+
     try {
       // Vérifier si la valeur est un nombre valide
       final fiatText = _fiatAmountController.text;
@@ -93,10 +99,10 @@ class _SendScreenState extends State<SendScreen> {
         _satsAmountController.text = '0';
         return;
       }
-      
+
       final fiatAmount = double.parse(fiatText);
       final satsAmount = currencyService.fiatToSats(fiatAmount);
-      
+
       // Désactiver temporairement les écouteurs pour éviter les boucles de mise à jour
       _inputInFiat = false;
       _satsAmountController.text = satsAmount.toStringAsFixed(0);
@@ -126,9 +132,9 @@ class _SendScreenState extends State<SendScreen> {
     try {
       final address = _addressController.text.trim();
       final amount = double.parse(_satsAmountController.text);
-      
+
       final success = await walletService.sendTransaction(address, amount);
-      
+
       if (success && mounted) {
         // Show success message and go back to home
         ScaffoldMessenger.of(context).showSnackBar(
@@ -163,9 +169,7 @@ class _SendScreenState extends State<SendScreen> {
     if (wallet == null) {
       return const Scaffold(
         body: Center(
-          child: CircularProgressIndicator(
-            color: AppTheme.bitcoinOrange,
-          ),
+          child: CircularProgressIndicator(color: AppTheme.bitcoinOrange),
         ),
       );
     }
@@ -179,7 +183,7 @@ class _SendScreenState extends State<SendScreen> {
           onPressed: () => Navigator.pushReplacementNamed(context, '/home'),
         ),
         title: const Text(
-          'Send SATS',
+          'Envoyer SATS',
           style: TextStyle(color: AppTheme.textPrimary),
         ),
       ),
@@ -218,15 +222,21 @@ class _SendScreenState extends State<SendScreen> {
                           crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
                             Text(
-                              'Available Balance',
-                              style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-                                    color: AppTheme.textSecondary,
-                                  ),
+                              'Solde disponible',
+                              style: Theme.of(context).textTheme.bodyMedium
+                                  ?.copyWith(color: AppTheme.textSecondary),
                             ),
                             const SizedBox(height: 4),
                             Text(
                               '${Formatters.formatSats(wallet.balance)} SATS',
                               style: Theme.of(context).textTheme.titleLarge,
+                            ),
+                            const SizedBox(height: 2),
+                            Text(
+                              '≈ ${currencyService.satsToFiat(wallet.balance).toStringAsFixed(2)} ${currencyService.selectedCurrency}',
+                              style: Theme.of(context).textTheme.bodySmall?.copyWith(
+                                color: AppTheme.textSecondary,
+                              ),
                             ),
                           ],
                         ),
@@ -235,99 +245,107 @@ class _SendScreenState extends State<SendScreen> {
                   ),
                 ),
               ),
-              
+
               const SizedBox(height: 32),
-              
+
               // Recipient address
               Text(
-                'Recipient Address',
+                'Adresse du destinataire',
                 style: Theme.of(context).textTheme.titleMedium,
               ),
               const SizedBox(height: 12),
               TextFormField(
                 controller: _addressController,
                 decoration: const InputDecoration(
-                  hintText: 'Enter SATS address',
+                  hintText: 'Entrez l\'adresse SATS',
                   prefixIcon: Icon(Icons.person),
                 ),
                 validator: (value) {
                   if (value == null || value.trim().isEmpty) {
-                    return 'Please enter an address';
+                    return 'Veuillez entrer une adresse';
                   }
                   // In a real app, validate the SATS address format
                   if (value.length < 10) {
-                    return 'Please enter a valid SATS address';
+                    return 'Veuillez entrer une adresse SATS valide';
                   }
                   return null;
                 },
               ),
-              
+
               const SizedBox(height: 24),
-              
+
               // Amount with currency converter
               Row(
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
                   Text(
-                    'Amount',
+                    'Montant',
                     style: Theme.of(context).textTheme.titleMedium,
                   ),
                   TextButton.icon(
                     icon: Icon(
-                      _inputInFiat ? Icons.currency_bitcoin : Icons.attach_money,
+                      _inputInFiat
+                          ? Icons.currency_bitcoin
+                          : Icons.attach_money,
                       size: 18,
                     ),
                     label: Text(
-                      _inputInFiat 
-                          ? 'Switch to SATS' 
-                          : 'Switch to ${currencyService.selectedCurrency}',
+                      _inputInFiat
+                          ? 'Passer aux SATS'
+                          : 'Passer à ${currencyService.selectedCurrency}',
                       style: const TextStyle(fontSize: 14),
                     ),
                     onPressed: _toggleInputMode,
                     style: TextButton.styleFrom(
                       foregroundColor: AppTheme.bitcoinOrange,
-                      padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+                      padding: const EdgeInsets.symmetric(
+                        horizontal: 12,
+                        vertical: 8,
+                      ),
                     ),
                   ),
                 ],
               ),
               const SizedBox(height: 12),
-              
+
               // Currency conversion UI
               AnimatedCrossFade(
                 firstChild: _buildSatsInput(wallet),
                 secondChild: _buildFiatInput(currencyService),
-                crossFadeState: _inputInFiat 
-                    ? CrossFadeState.showSecond 
-                    : CrossFadeState.showFirst,
+                crossFadeState:
+                    _inputInFiat
+                        ? CrossFadeState.showSecond
+                        : CrossFadeState.showFirst,
                 duration: const Duration(milliseconds: 300),
               ),
-              
+
               // Conversion display
               const SizedBox(height: 16),
               _buildConversionDisplay(currencyService),
-              
+
               // Send button
               const SizedBox(height: 32),
               SizedBox(
                 width: double.infinity,
                 child: ElevatedButton(
-                  onPressed: _isSending || _satsAmountController.text.isEmpty
-                      ? null
-                      : () => _sendTransaction(walletService),
-                  child: _isSending
-                      ? const SizedBox(
-                          height: 20,
-                          width: 20,
-                          child: CircularProgressIndicator(
-                            color: Colors.white,
-                            strokeWidth: 2,
-                          ),
-                        )
-                      : const Text('Send sBTC'),
+                  onPressed:
+                      _isSending || _satsAmountController.text.isEmpty
+                          ? null
+                          : () => _sendTransaction(walletService),
+                  child:
+                      _isSending
+                          ? const SizedBox(
+                            height: 20,
+                            width: 20,
+                            child: CircularProgressIndicator(
+                              color: Colors.white,
+                              strokeWidth: 2,
+                            ),
+                          )
+                          : const Text('Envoyer sats'),
                 ),
               ),
-              
+
               // Error message
               if (_errorMessage != null)
                 Padding(
@@ -341,7 +359,7 @@ class _SendScreenState extends State<SendScreen> {
                     textAlign: TextAlign.center,
                   ),
                 ),
-                
+
               // Transaction note
               const SizedBox(height: 24),
               Container(
@@ -352,18 +370,12 @@ class _SendScreenState extends State<SendScreen> {
                 ),
                 child: Row(
                   children: [
-                    Icon(
-                      Icons.info_outline,
-                      color: Colors.blue[700],
-                    ),
+                    Icon(Icons.info_outline, color: Colors.blue[700]),
                     const SizedBox(width: 12),
                     Expanded(
                       child: Text(
-                        'Transactions may take a few minutes to be confirmed on the Stacks blockchain.',
-                        style: TextStyle(
-                          color: Colors.blue[700],
-                          fontSize: 14,
-                        ),
+                        'Les transactions peuvent prendre quelques minutes à être confirmées sur la blockchain.',
+                        style: TextStyle(color: Colors.blue[700], fontSize: 14),
                       ),
                     ),
                   ],
@@ -375,20 +387,18 @@ class _SendScreenState extends State<SendScreen> {
       ),
     );
   }
-  
+
   Widget _buildSatsInput(wallet) {
     return TextFormField(
       controller: _satsAmountController,
       decoration: const InputDecoration(
-        hintText: 'Enter amount',
+        hintText: 'Entrez le montant',
         prefixIcon: Icon(Icons.currency_bitcoin),
         suffixText: 'SATS',
       ),
       keyboardType: const TextInputType.numberWithOptions(decimal: true),
       // Limiter la saisie aux nombres entiers pour les SATS
-      inputFormatters: [
-        FilteringTextInputFormatter.allow(RegExp(r'^\d*')),
-      ],
+      inputFormatters: [FilteringTextInputFormatter.allow(RegExp(r'^\d*'))],
       // Ne pas mettre à jour pendant la frappe mais seulement lors de la perte de focus
       onChanged: (value) {
         // Laisser le champ tel quel pendant la saisie
@@ -402,29 +412,29 @@ class _SendScreenState extends State<SendScreen> {
       },
       validator: (value) {
         if (value == null || value.trim().isEmpty) {
-          return 'Please enter an amount';
+          return 'Veuillez entrer un montant';
         }
         try {
           final amount = double.parse(value);
           if (amount <= 0) {
-            return 'Amount must be greater than 0';
+            return 'Le montant doit être supérieur à 0';
           }
           if (amount > wallet.balance) {
-            return 'Insufficient balance';
+            return 'Solde insuffisant';
           }
         } catch (e) {
-          return 'Please enter a valid amount';
+          return 'Veuillez entrer un montant valide';
         }
         return null;
       },
     );
   }
-  
+
   Widget _buildFiatInput(CurrencyService currencyService) {
     return TextFormField(
       controller: _fiatAmountController,
       decoration: InputDecoration(
-        hintText: 'Enter amount',
+        hintText: 'Entrez le montant',
         prefixIcon: const Icon(Icons.attach_money),
         suffixText: currencyService.selectedCurrency,
       ),
@@ -442,80 +452,75 @@ class _SendScreenState extends State<SendScreen> {
       // Validation pour les montants fiat
       validator: (value) {
         if (value == null || value.trim().isEmpty) {
-          return 'Please enter an amount';
+          return 'Veuillez entrer un montant';
         }
         try {
           final amount = double.parse(value);
           if (amount <= 0) {
-            return 'Amount must be greater than 0';
+            return 'Le montant doit être supérieur à 0';
           }
-          
+
           // Vérifier si le montant équivalent en SATS est supérieur au solde
           final satsAmount = currencyService.fiatToSats(amount);
-          if (satsAmount > Provider.of<WalletService>(context, listen: false).wallet!.balance) {
-            return 'Insufficient balance';
+          if (satsAmount >
+              Provider.of<WalletService>(
+                context,
+                listen: false,
+              ).wallet!.balance) {
+            return 'Solde insuffisant';
           }
         } catch (e) {
-          return 'Please enter a valid amount';
+          return 'Veuillez entrer un montant valide';
         }
         return null;
       },
     );
   }
-  
+
   Widget _buildConversionDisplay(CurrencyService currencyService) {
-    String displayText = 'Enter an amount to see conversion';
-    
+    String displayText = 'Entrez un montant pour voir la conversion';
+
     try {
       if (_inputInFiat) {
         if (_fiatAmountController.text.isNotEmpty) {
           final fiatAmount = double.parse(_fiatAmountController.text);
           final satsAmount = currencyService.fiatToSats(fiatAmount);
-          displayText = '${fiatAmount.toStringAsFixed(2)} ${currencyService.selectedCurrency} = ${Formatters.formatSats(satsAmount)} SATS';
+          displayText =
+              '${fiatAmount.toStringAsFixed(2)} ${currencyService.selectedCurrency} = ${Formatters.formatSats(satsAmount)} SATS';
         }
       } else {
         if (_satsAmountController.text.isNotEmpty) {
           final satsAmount = double.parse(_satsAmountController.text);
           final fiatAmount = currencyService.satsToFiat(satsAmount);
-          displayText = '${Formatters.formatSats(satsAmount)} SATS = ${fiatAmount.toStringAsFixed(2)} ${currencyService.selectedCurrency}';
+          displayText =
+              '${Formatters.formatSats(satsAmount)} SATS = ${fiatAmount.toStringAsFixed(2)} ${currencyService.selectedCurrency}';
         }
       }
     } catch (e) {
-      displayText = 'Invalid amount';
+      displayText = 'Montant invalide';
     }
-    
+
     return Card(
       elevation: 0,
       color: AppTheme.cardBackground,
-      shape: RoundedRectangleBorder(
-        borderRadius: BorderRadius.circular(12),
-      ),
+      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
       child: Padding(
         padding: const EdgeInsets.all(12),
         child: Row(
           children: [
-            Icon(
-              Icons.sync_alt,
-              size: 16,
-              color: AppTheme.textSecondary,
-            ),
+            Icon(Icons.sync_alt, size: 16, color: AppTheme.textSecondary),
             const SizedBox(width: 8),
             Expanded(
               child: Text(
                 displayText,
-                style: TextStyle(
-                  fontSize: 14,
-                  color: AppTheme.textSecondary,
-                ),
+                style: TextStyle(fontSize: 14, color: AppTheme.textSecondary),
               ),
             ),
             if (currencyService.isLoading)
               const SizedBox(
                 height: 16,
                 width: 16,
-                child: CircularProgressIndicator(
-                  strokeWidth: 2,
-                ),
+                child: CircularProgressIndicator(strokeWidth: 2),
               ),
           ],
         ),
