@@ -19,6 +19,7 @@ import 'screens/track_screen.dart';
 import 'screens/currency_screen.dart';
 import 'screens/settings_screen.dart';
 import 'screens/about_screen.dart';
+import 'screens/vault_screen.dart';
 import 'screens/splash_screen.dart';
 import 'screens/registration_screen.dart';
 import 'screens/otp_verification_screen.dart';
@@ -75,6 +76,7 @@ class MyApp extends StatelessWidget {
           // Drawer routes
           '/account': (context) => const AccountScreen(),
           '/track': (context) => const TrackScreen(),
+          '/vaults': (context) => const VaultScreen(),
           '/currency': (context) => const CurrencyScreen(),
           '/settings': (context) => const SettingsScreen(),
           '/about': (context) => const AboutScreen(),

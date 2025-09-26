@@ -49,6 +49,13 @@ class AppDrawer extends StatelessWidget {
                   route: Constants.routeAccount,
                   isSelected: currentRoute == Constants.routeAccount,
                 ),
+                _buildDrawerItem(
+                  context,
+                  icon: Icons.savings_rounded,
+                  title: 'Coffre d\'Épargne',
+                  route: Constants.routeVaults,
+                  isSelected: currentRoute == Constants.routeVaults,
+                ),
 
                 _buildDrawerItem(
                   context,
