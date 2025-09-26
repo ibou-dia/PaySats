@@ -168,28 +168,19 @@ class CurrencyService extends ChangeNotifier {
   
   // Fetch exchange rates from API
   Future<void> fetchExchangeRates() async {
-    print('🔵 [DEBUG] fetchExchangeRates appelé');
-    
     if (_isLoading) return;
     
     _setLoading(true);
     _clearError();
     
     try {
-      print('🔵 [DEBUG] Tentative de récupération des taux depuis: $_priceApiUrl');
-      
       final response = await http.get(Uri.parse(_priceApiUrl));
-      
-      print('🔵 [DEBUG] Code de réponse HTTP: ${response.statusCode}');
-      print('🔵 [DEBUG] Taille de la réponse: ${response.body.length} caractères');
       
       if (response.statusCode == 200) {
         final data = jsonDecode(response.body);
-        print('🔵 [DEBUG] Données JSON décodées: ${data.keys.toList()}');
         
         if (data.containsKey('bitcoin')) {
           final bitcoin = data['bitcoin'];
-          print('🔵 [DEBUG] Données Bitcoin trouvées: ${bitcoin.keys.toList()}');
           
           // Update exchange rates
           _exchangeRates = {
@@ -208,33 +199,19 @@ class CurrencyService extends ChangeNotifier {
           if (usdRate > 0) {
             final xofRate = usdRate * 655.957; // USD to XOF conversion
             _exchangeRates['XOF'] = xofRate;
-            print('🔵 [DEBUG] Taux USD trouvé: $usdRate');
-            print('🔵 [DEBUG] Taux XOF calculé: $xofRate');
-          } else {
-            print('🔴 [ERROR] Taux USD non trouvé ou invalide');
           }
           
           _lastUpdated = DateTime.now();
-          print('🟢 [SUCCESS] Taux de change mis à jour avec succès');
-          print('🔵 [DEBUG] Nombre de taux: ${_exchangeRates.length}');
-          print('🔵 [DEBUG] Taux BTC/XOF: ${_exchangeRates['XOF']}');
         } else {
-          print('🔴 [ERROR] Données Bitcoin non trouvées dans la réponse');
           _setError('Bitcoin data not found in response');
         }
       } else {
-        print('🔴 [ERROR] Échec de l\'API: ${response.statusCode}');
-        print('🔴 [ERROR] Corps de la réponse: ${response.body}');
         _setError('Failed to fetch exchange rates: ${response.statusCode}');
       }
     } catch (e) {
-      print('🔴 [ERROR] Exception dans fetchExchangeRates: ${e.toString()}');
-      print('🔴 [ERROR] Type d\'exception: ${e.runtimeType}');
-      
       _setError('Error fetching exchange rates: ${e.toString()}');
       
       // Use fallback rates if API call fails
-      print('🟡 [WARNING] Utilisation des taux de secours');
       if (_exchangeRates['USD'] == 0.0) {
         _exchangeRates = {
           'USD': 50000.0, // 1 BTC = 50,000 USD
@@ -246,15 +223,9 @@ class CurrencyService extends ChangeNotifier {
           'CHF': 45000.0,
           'XOF': 32797850.0, // 1 BTC = 32,797,850 XOF (50,000 * 655.957)
         };
-        
-        print('🔵 [DEBUG] Taux de secours appliqués:');
-        _exchangeRates.forEach((currency, rate) {
-          print('🔵 [DEBUG] $currency: $rate');
-        });
       }
     } finally {
       _setLoading(false);
-      print('🔵 [DEBUG] Fin de fetchExchangeRates');
     }
   }
   
