@@ -213,12 +213,7 @@ class _VaultScreenState extends State<VaultScreen> {
             offset: const Offset(0, 2),
           ),
         ],
-        border: Border.all(
-          color:
-              isLocked
-                  ? Colors.red.withOpacity(0.3)
-                  : AppTheme.bitcoinOrange.withOpacity(0.2),
-        ),
+        border: Border.all(color: AppTheme.bitcoinOrange.withOpacity(0.2)),
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
@@ -334,7 +329,7 @@ class _VaultScreenState extends State<VaultScreen> {
                   icon: const Icon(Icons.add, size: 18),
                   label: const Text('Ajouter'),
                   style: ElevatedButton.styleFrom(
-                    backgroundColor: Colors.green,
+                    backgroundColor: AppTheme.bitcoinOrange,
                     foregroundColor: Colors.white,
                     padding: const EdgeInsets.symmetric(vertical: 12),
                     shape: RoundedRectangleBorder(
@@ -347,12 +342,17 @@ class _VaultScreenState extends State<VaultScreen> {
               // Bouton Retirer (seulement si non verrouillé)
               Expanded(
                 child: ElevatedButton.icon(
-                  onPressed: isLocked ? null : () => _showWithdrawMoneyDialog(context, vault),
+                  onPressed:
+                      isLocked
+                          ? null
+                          : () => _showWithdrawMoneyDialog(context, vault),
                   icon: const Icon(Icons.remove, size: 18),
                   label: const Text('Retirer'),
                   style: ElevatedButton.styleFrom(
-                    backgroundColor: isLocked ? Colors.grey.shade300 : AppTheme.bitcoinOrange,
-                    foregroundColor: isLocked ? Colors.grey.shade600 : Colors.white,
+                    backgroundColor:
+                        isLocked ? Colors.grey.shade300 : Colors.red,
+                    foregroundColor:
+                        isLocked ? Colors.grey.shade600 : Colors.white,
                     padding: const EdgeInsets.symmetric(vertical: 12),
                     shape: RoundedRectangleBorder(
                       borderRadius: BorderRadius.circular(8),
@@ -435,7 +435,10 @@ class _VaultScreenState extends State<VaultScreen> {
           // Créer un nouveau vault avec le montant mis à jour
           final index = vaults.indexOf(vault);
           if (index != -1) {
-            final newAmount = (vault.currentAmount - amount).clamp(0.0, vault.currentAmount);
+            final newAmount = (vault.currentAmount - amount).clamp(
+              0.0,
+              vault.currentAmount,
+            );
             vaults[index] = Vault(
               id: vault.id,
               userId: vault.userId,
@@ -746,12 +749,18 @@ class _AddMoneyDialogState extends State<AddMoneyDialog> {
             children: [
               Row(
                 children: [
-                  Icon(Icons.add_circle, color: Colors.green, size: 28),
+                  Icon(
+                    Icons.add_circle,
+                    color: AppTheme.bitcoinOrange,
+                    size: 28,
+                  ),
                   const SizedBox(width: 12),
                   Expanded(
                     child: Text(
                       'Ajouter de l\'argent',
-                      style: Theme.of(context).textTheme.headlineSmall?.copyWith(
+                      style: Theme.of(
+                        context,
+                      ).textTheme.headlineSmall?.copyWith(
                         fontWeight: FontWeight.bold,
                         color: Colors.black87,
                       ),
@@ -762,10 +771,7 @@ class _AddMoneyDialogState extends State<AddMoneyDialog> {
               const SizedBox(height: 8),
               Text(
                 'Coffre: ${widget.vault.name}',
-                style: TextStyle(
-                  color: AppTheme.textSecondary,
-                  fontSize: 14,
-                ),
+                style: TextStyle(color: AppTheme.textSecondary, fontSize: 14),
               ),
               const SizedBox(height: 24),
 
@@ -776,7 +782,7 @@ class _AddMoneyDialogState extends State<AddMoneyDialog> {
                 decoration: InputDecoration(
                   labelText: 'Montant (sats)',
                   hintText: 'Entrez le montant à ajouter',
-                  prefixIcon: const Icon(Icons.monetization_on),
+                  prefixIcon: const Icon(Icons.currency_bitcoin),
                   border: OutlineInputBorder(
                     borderRadius: BorderRadius.circular(12),
                   ),
@@ -809,7 +815,7 @@ class _AddMoneyDialogState extends State<AddMoneyDialog> {
                     child: ElevatedButton(
                       onPressed: _addMoney,
                       style: ElevatedButton.styleFrom(
-                        backgroundColor: Colors.green,
+                        backgroundColor: AppTheme.bitcoinOrange,
                         foregroundColor: Colors.white,
                         padding: const EdgeInsets.symmetric(vertical: 16),
                         shape: RoundedRectangleBorder(
@@ -870,12 +876,18 @@ class _WithdrawMoneyDialogState extends State<WithdrawMoneyDialog> {
             children: [
               Row(
                 children: [
-                  Icon(Icons.remove_circle, color: AppTheme.bitcoinOrange, size: 28),
+                  Icon(
+                    Icons.remove_circle,
+                    color: AppTheme.bitcoinOrange,
+                    size: 28,
+                  ),
                   const SizedBox(width: 12),
                   Expanded(
                     child: Text(
                       'Retirer de l\'argent',
-                      style: Theme.of(context).textTheme.headlineSmall?.copyWith(
+                      style: Theme.of(
+                        context,
+                      ).textTheme.headlineSmall?.copyWith(
                         fontWeight: FontWeight.bold,
                         color: Colors.black87,
                       ),
@@ -886,10 +898,7 @@ class _WithdrawMoneyDialogState extends State<WithdrawMoneyDialog> {
               const SizedBox(height: 8),
               Text(
                 'Coffre: ${widget.vault.name}',
-                style: TextStyle(
-                  color: AppTheme.textSecondary,
-                  fontSize: 14,
-                ),
+                style: TextStyle(color: AppTheme.textSecondary, fontSize: 14),
               ),
               Text(
                 'Solde disponible: ${Formatters.formatSats(widget.vault.currentAmount)} sats',
