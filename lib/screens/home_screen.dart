@@ -431,10 +431,57 @@ class _HomeScreenState extends State<HomeScreen> {
 
   void _handleDepositMethod(String method) {
     if (method == 'Wave') {
+      // Transition qui simule le changement d'application vers Wave
       Navigator.push(
         context,
-        MaterialPageRoute(
-          builder: (context) => const WavePaymentScreen(),
+        PageRouteBuilder(
+          pageBuilder: (context, animation, secondaryAnimation) => const WavePaymentScreen(),
+          transitionDuration: const Duration(milliseconds: 800),
+          reverseTransitionDuration: const Duration(milliseconds: 600),
+          transitionsBuilder: (context, animation, secondaryAnimation, child) {
+            // Animation de slide depuis la droite avec effet de zoom
+            const begin = Offset(1.0, 0.0);
+            const end = Offset.zero;
+            const curve = Curves.easeInOutCubic;
+
+            var slideAnimation = Tween(begin: begin, end: end).animate(
+              CurvedAnimation(parent: animation, curve: curve),
+            );
+
+            // Animation de scale pour simuler l'ouverture d'une nouvelle app
+            var scaleAnimation = Tween(begin: 0.8, end: 1.0).animate(
+              CurvedAnimation(parent: animation, curve: curve),
+            );
+
+            // Animation de fade pour l'écran précédent
+            var fadeAnimation = Tween(begin: 1.0, end: 0.0).animate(
+              CurvedAnimation(parent: animation, curve: Interval(0.0, 0.3, curve: curve)),
+            );
+
+            return Stack(
+              children: [
+                // Écran précédent qui disparaît en fondu
+                FadeTransition(
+                  opacity: fadeAnimation,
+                  child: Container(
+                    color: Colors.black,
+                    child: Transform.scale(
+                      scale: 1.1,
+                      child: Container(color: Colors.white),
+                    ),
+                  ),
+                ),
+                // Nouvel écran Wave qui apparaît
+                SlideTransition(
+                  position: slideAnimation,
+                  child: ScaleTransition(
+                    scale: scaleAnimation,
+                    child: child,
+                  ),
+                ),
+              ],
+            );
+          },
         ),
       ).then((result) {
         // Rafraîchir les données si le dépôt a réussi
