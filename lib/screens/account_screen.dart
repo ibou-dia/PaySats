@@ -32,7 +32,7 @@ class AccountScreen extends StatelessWidget {
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             Text(
-              'My Account',
+              'Mon Compte',
               style: Theme.of(context).textTheme.headlineMedium,
             ),
             const SizedBox(height: 24),
@@ -49,14 +49,14 @@ class AccountScreen extends StatelessWidget {
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     Text(
-                      'Wallet Information',
+                      'Informations du Portefeuille',
                       style: Theme.of(context).textTheme.titleLarge,
                     ),
                     const SizedBox(height: 16),
                     
                     _buildInfoRow(
                       context, 
-                      title: 'Wallet Address', 
+                      title: 'Adresse du Portefeuille', 
                       value: Formatters.shortenAddress(wallet.address, start: 10, end: 10),
                       canCopy: true,
                       copyValue: wallet.address,
@@ -65,15 +65,15 @@ class AccountScreen extends StatelessWidget {
                     
                     _buildInfoRow(
                       context, 
-                      title: 'Current Balance', 
+                      title: 'Solde Actuel', 
                       value: '${Formatters.formatSats(wallet.balance)} SATS',
                     ),
                     const Divider(height: 32),
                     
                     _buildInfoRow(
                       context, 
-                      title: 'Status', 
-                      value: wallet.connected ? 'Connected' : 'Disconnected',
+                      title: 'Statut', 
+                      value: wallet.connected ? 'Connecté' : 'Déconnecté',
                       valueColor: wallet.connected ? Colors.green : Colors.red,
                     ),
                   ],
@@ -85,7 +85,7 @@ class AccountScreen extends StatelessWidget {
             
             // Security Section
             Text(
-              'Security',
+              'Sécurité',
               style: Theme.of(context).textTheme.titleLarge,
             ),
             const SizedBox(height: 16),
@@ -100,13 +100,13 @@ class AccountScreen extends StatelessWidget {
                   _buildSettingTile(
                     context,
                     icon: Icons.backup,
-                    title: 'Backup Wallet',
-                    subtitle: 'Create a backup of your wallet',
+                    title: 'Sauvegarder le Portefeuille',
+                    subtitle: 'Créer une sauvegarde de votre portefeuille',
                     onTap: () {
                       // TODO: Implement backup functionality
                       ScaffoldMessenger.of(context).showSnackBar(
                         const SnackBar(
-                          content: Text('Backup feature coming soon'),
+                          content: Text('Fonctionnalité de sauvegarde bientôt disponible'),
                         ),
                       );
                     },
@@ -115,13 +115,13 @@ class AccountScreen extends StatelessWidget {
                   _buildSettingTile(
                     context,
                     icon: Icons.password,
-                    title: 'Change PIN',
-                    subtitle: 'Update your wallet security PIN',
+                    title: 'Changer le PIN',
+                    subtitle: 'Mettre à jour votre PIN de sécurité',
                     onTap: () {
                       // TODO: Implement PIN change functionality
                       ScaffoldMessenger.of(context).showSnackBar(
                         const SnackBar(
-                          content: Text('PIN change feature coming soon'),
+                          content: Text('Changement de PIN bientôt disponible'),
                         ),
                       );
                     },
@@ -130,13 +130,13 @@ class AccountScreen extends StatelessWidget {
                   _buildSettingTile(
                     context,
                     icon: Icons.refresh,
-                    title: 'Refresh Wallet Data',
-                    subtitle: 'Sync with latest blockchain data',
+                    title: 'Actualiser les Données',
+                    subtitle: 'Synchroniser avec les dernières données blockchain',
                     onTap: () {
                       // TODO: Implement refresh functionality
                       ScaffoldMessenger.of(context).showSnackBar(
                         const SnackBar(
-                          content: Text('Refreshing wallet data...'),
+                          content: Text('Actualisation des données en cours...'),
                         ),
                       );
                       // This would call a wallet service method
@@ -191,7 +191,7 @@ class AccountScreen extends StatelessWidget {
                     // Copy to clipboard
                     ScaffoldMessenger.of(context).showSnackBar(
                       const SnackBar(
-                        content: Text('Address copied to clipboard'),
+                        content: Text('Adresse copiée dans le presse-papiers'),
                         duration: Duration(seconds: 2),
                       ),
                     );
