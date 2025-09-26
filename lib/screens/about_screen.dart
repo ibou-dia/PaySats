@@ -18,7 +18,7 @@ class AboutScreen extends StatelessWidget {
           crossAxisAlignment: CrossAxisAlignment.center,
           children: [
             Text(
-              'About',
+              'À Propos',
               style: Theme.of(context).textTheme.headlineMedium,
               textAlign: TextAlign.center,
             ),
@@ -28,7 +28,7 @@ class AboutScreen extends StatelessWidget {
             const BitcoinLogo(size: 80),
             const SizedBox(height: 24),
             Text(
-              'sBTC Wallet',
+              'PaySats',
               style: Theme.of(context).textTheme.headlineMedium,
               textAlign: TextAlign.center,
             ),
@@ -44,7 +44,7 @@ class AboutScreen extends StatelessWidget {
             
             // App description
             const Text(
-              'sBTC Wallet is a mobile application for managing your tokenized Bitcoin (SATS) on the Stacks blockchain.',
+              'PaySats est une application mobile de paiement et de gestion financière qui facilite les transactions et la gestion de vos finances.',
               textAlign: TextAlign.center,
             ),
             const SizedBox(height: 24),
@@ -61,28 +61,28 @@ class AboutScreen extends StatelessWidget {
                     _buildLinkRow(
                       context,
                       icon: Icons.code,
-                      title: 'GitHub Repository',
-                      url: 'https://github.com/user/sbtc-wallet',
+                      title: 'Dépôt GitHub',
+                      url: 'https://github.com/user/paysats',
                     ),
                     const Divider(height: 24),
                     _buildLinkRow(
                       context,
                       icon: Icons.public,
-                      title: 'sBTC Documentation',
-                      url: 'https://docs.stacks.co/docs/sbtc/',
+                      title: 'Documentation PaySats',
+                      url: 'https://docs.paysats.com/',
                     ),
                     const Divider(height: 24),
                     _buildLinkRow(
                       context,
                       icon: Icons.shield,
-                      title: 'Privacy Policy',
+                      title: 'Politique de Confidentialité',
                       url: 'https://example.com/privacy',
                     ),
                     const Divider(height: 24),
                     _buildLinkRow(
                       context,
                       icon: Icons.gavel,
-                      title: 'Terms of Service',
+                      title: 'Conditions d\'Utilisation',
                       url: 'https://example.com/terms',
                     ),
                   ],
@@ -95,23 +95,23 @@ class AboutScreen extends StatelessWidget {
             // Info sections
             _buildInfoSection(
               context,
-              title: 'What is sBTC?',
-              content: 'sBTC is a tokenized version of Bitcoin that operates on the Stacks blockchain. It is backed 1:1 by BTC and enables smart contract functionality with Bitcoin-level security.',
+              title: 'Qu\'est-ce que PaySats ?',
+              content: 'PaySats est une application mobile innovante qui simplifie les paiements et la gestion financière. Elle offre une interface intuitive pour effectuer des transactions rapides et sécurisées.',
             ),
             
             const SizedBox(height: 24),
             
             _buildInfoSection(
               context,
-              title: 'How it works',
-              content: 'sBTC uses a peg mechanism to lock BTC and mint an equivalent amount of sBTC on the Stacks blockchain. This allows Bitcoin to be used in decentralized applications while maintaining its value.',
+              title: 'Comment ça fonctionne',
+              content: 'PaySats utilise des technologies modernes pour garantir la sécurité et la rapidité de vos transactions. L\'application vous permet de gérer facilement vos finances avec des fonctionnalités avancées de suivi et de contrôle.',
             ),
             
             const SizedBox(height: 40),
             
             // Credits
             Text(
-              '© 2025 sBTC Wallet Team',
+              '© 2025 Équipe PaySats',
               style: Theme.of(context).textTheme.bodySmall?.copyWith(
                     color: AppTheme.textSecondary,
                   ),
