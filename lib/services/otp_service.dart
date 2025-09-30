@@ -1,5 +1,7 @@
 import 'dart:math';
 import 'package:flutter/foundation.dart';
+import 'package:flutter/material.dart';
+import 'notification_service.dart';
 
 enum OtpType {
   registration,
@@ -55,7 +57,7 @@ class OtpService extends ChangeNotifier {
   final Map<String, DateTime> _lastRequestTimes = {};
 
   /// Envoie un code OTP par SMS
-  Future<bool> sendOtp(String phoneNumber, OtpType type) async {
+  Future<bool> sendOtp(String phoneNumber, OtpType type, {BuildContext? context, NotificationService? notificationService, bool showNotification = true}) async {
     try {
       // Vérifier le délai entre les demandes (1 minute minimum)
       if (_canSendOtp(phoneNumber)) {
@@ -72,7 +74,7 @@ class OtpService extends ChangeNotifier {
         _lastRequestTimes[phoneNumber] = DateTime.now();
 
         // Simuler l'envoi SMS (dans une vraie app, utiliser un service SMS)
-        await _simulateSmsDelivery(phoneNumber, code, type);
+        await _simulateSmsDelivery(phoneNumber, code, type, context: context, notificationService: notificationService, showNotification: showNotification);
 
         notifyListeners();
         return true;
@@ -124,13 +126,13 @@ class OtpService extends ChangeNotifier {
   }
 
   /// Renvoie un code OTP
-  Future<bool> resendOtp(String phoneNumber) async {
+  Future<bool> resendOtp(String phoneNumber, {BuildContext? context, NotificationService? notificationService, bool showNotification = true}) async {
     final request = _activeRequests[phoneNumber];
     if (request == null) {
       throw Exception('Aucun code OTP en cours pour ce numéro');
     }
 
-    return await sendOtp(phoneNumber, request.type);
+    return await sendOtp(phoneNumber, request.type, context: context, notificationService: notificationService, showNotification: showNotification);
   }
 
   /// Annule une demande OTP
@@ -197,7 +199,7 @@ class OtpService extends ChangeNotifier {
     return code.toString();
   }
 
-  Future<void> _simulateSmsDelivery(String phoneNumber, String code, OtpType type) async {
+  Future<void> _simulateSmsDelivery(String phoneNumber, String code, OtpType type, {BuildContext? context, NotificationService? notificationService, bool showNotification = true}) async {
     // Simuler un délai d'envoi SMS
     await Future.delayed(const Duration(seconds: 2));
 
@@ -217,6 +219,18 @@ class OtpService extends ChangeNotifier {
     // En mode debug, afficher le code dans la console
     if (kDebugMode) {
       debugPrint('📱 SMS envoyé à $phoneNumber: $message');
+    }
+
+    // Afficher la notification simulée si le contexte et le service sont disponibles
+    if (context != null && notificationService != null && showNotification) {
+      // Attendre un peu plus avant d'afficher la notification pour un effet plus réaliste
+      await Future.delayed(const Duration(seconds: 1));
+      
+      await notificationService.simulateSmsNotification(
+        phoneNumber: phoneNumber,
+        message: message,
+        context: context,
+      );
     }
 
     // Dans une vraie application, ici on appellerait l'API SMS

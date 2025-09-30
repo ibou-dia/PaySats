@@ -4,6 +4,7 @@ import 'package:provider/provider.dart';
 import 'package:intl_phone_field/intl_phone_field.dart';
 import '../services/auth_service.dart';
 import '../services/otp_service.dart';
+import '../services/notification_service.dart';
 import '../theme/app_theme.dart';
 import '../widgets/bitcoin_logo.dart';
 
@@ -61,9 +62,12 @@ class _RegistrationScreenState extends State<RegistrationScreen> {
       await authService.generateWallet();
 
       // Étape 3: Envoyer l'OTP pour vérification
+      final notificationService = Provider.of<NotificationService>(context, listen: false);
       final otpSent = await otpService.sendOtp(
         _completePhoneNumber,
         OtpType.registration,
+        context: context,
+        notificationService: notificationService,
       );
 
       if (otpSent && mounted) {

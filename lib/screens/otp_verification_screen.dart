@@ -4,6 +4,7 @@ import 'package:provider/provider.dart';
 import 'dart:async';
 import '../services/auth_service.dart';
 import '../services/otp_service.dart';
+import '../services/notification_service.dart';
 import '../theme/app_theme.dart';
 
 class OtpVerificationScreen extends StatefulWidget {
@@ -180,7 +181,13 @@ class _OtpVerificationScreenState extends State<OtpVerificationScreen> {
 
     try {
       final otpService = Provider.of<OtpService>(context, listen: false);
-      final success = await otpService.resendOtp(_phoneNumber!);
+      final notificationService = Provider.of<NotificationService>(context, listen: false);
+      final success = await otpService.resendOtp(
+        _phoneNumber!,
+        context: context,
+        notificationService: notificationService,
+        showNotification: false, // Désactiver la notification automatique sur l'écran de vérification
+      );
 
       if (success) {
         _startResendTimer();

@@ -6,6 +6,7 @@ import 'services/wallet_service.dart';
 import 'services/currency_service.dart';
 import 'services/auth_service.dart';
 import 'services/otp_service.dart';
+import 'services/notification_service.dart';
 
 // Import screens
 import 'screens/auth_screen.dart';
@@ -48,6 +49,7 @@ class MyApp extends StatelessWidget {
         ChangeNotifierProvider(create: (_) => CurrencyService()),
         ChangeNotifierProvider(create: (_) => AuthService()),
         ChangeNotifierProvider(create: (_) => OtpService()),
+        ChangeNotifierProvider(create: (_) => NotificationService()),
       ],
       child: MaterialApp(
         title: Constants.appName,

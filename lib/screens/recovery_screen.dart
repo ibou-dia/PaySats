@@ -4,6 +4,7 @@ import 'package:provider/provider.dart';
 import 'package:intl_phone_field/intl_phone_field.dart';
 import '../services/auth_service.dart';
 import '../services/otp_service.dart';
+import '../services/notification_service.dart';
 import '../models/auth_state.dart';
 import '../theme/app_theme.dart';
 
@@ -121,7 +122,13 @@ class _RecoveryScreenState extends State<RecoveryScreen>
       }
 
       // Envoyer l'OTP de récupération
-      await otpService.sendOtp(phoneNumber, OtpType.recovery);
+      final notificationService = Provider.of<NotificationService>(context, listen: false);
+      await otpService.sendOtp(
+        phoneNumber, 
+        OtpType.recovery,
+        context: context,
+        notificationService: notificationService,
+      );
       
       setState(() {
         _isOtpSent = true;
@@ -222,8 +229,14 @@ class _RecoveryScreenState extends State<RecoveryScreen>
 
     try {
       final otpService = Provider.of<OtpService>(context, listen: false);
+      final notificationService = Provider.of<NotificationService>(context, listen: false);
       final phoneNumber = _completePhoneNumber.isNotEmpty ? _completePhoneNumber : _phoneController.text.trim();
-      await otpService.resendOtp(phoneNumber);
+      await otpService.resendOtp(
+        phoneNumber,
+        context: context,
+        notificationService: notificationService,
+        showNotification: false, // Désactiver la notification automatique sur l'écran de récupération
+      );
       
       setState(() {
         _successMessage = 'Nouveau code envoyé';
