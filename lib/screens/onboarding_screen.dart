@@ -23,7 +23,7 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
     OnboardingPage(
       title: 'Qu\'est-ce que PaySats?',
       description:
-          'PaySats combine Bitcoin, Mobile Money, épargne et investissement dans une seule application simple et sécurisée.',
+          'PaySats combine Bitcoin, Mobile Money et épargne dans une seule application simple et sécurisée.',
       image: 'assets/images/onboarding_2.png',
       imageIcon: Icons.currency_bitcoin,
     ),
@@ -44,7 +44,7 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
     OnboardingPage(
       title: 'Commencez Maintenant',
       description:
-          'Gérez vos paiements, épargne et investissements facilement. Envoyez, recevez et suivez vos transactions.',
+          'Gérez vos paiements et épargne facilement. Envoyez, recevez et suivez vos transactions.',
       image: 'assets/images/onboarding_4.png',
       imageIcon: Icons.rocket_launch,
     ),

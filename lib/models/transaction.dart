@@ -17,11 +17,6 @@ enum TransactionType {
   vaultWithdraw,
   vaultInterest,
 
-  // Investment operations
-  investmentBuy,
-  investmentSell,
-  investmentDividend,
-
   // Internal transfers
   internalTransfer,
 
@@ -43,7 +38,7 @@ enum TransactionStatus {
   expired,
 }
 
-enum TransactionCategory { payment, transfer, investment, savings, fee, reward }
+enum TransactionCategory { payment, transfer, savings, fee, reward }
 
 class Transaction {
   final String id;
@@ -72,7 +67,6 @@ class Transaction {
   // Related entity IDs
   final String? walletId;
   final String? vaultId;
-  final String? investmentId;
   final String? mobileMoneyAccountId;
   final String? lightningPaymentId;
 
@@ -101,7 +95,6 @@ class Transaction {
     this.metadata,
     this.walletId,
     this.vaultId,
-    this.investmentId,
     this.mobileMoneyAccountId,
     this.lightningPaymentId,
   });
@@ -132,7 +125,6 @@ class Transaction {
     Map<String, dynamic>? metadata,
     String? walletId,
     String? vaultId,
-    String? investmentId,
     String? mobileMoneyAccountId,
     String? lightningPaymentId,
   }) {
@@ -161,7 +153,6 @@ class Transaction {
       metadata: metadata ?? this.metadata,
       walletId: walletId ?? this.walletId,
       vaultId: vaultId ?? this.vaultId,
-      investmentId: investmentId ?? this.investmentId,
       mobileMoneyAccountId: mobileMoneyAccountId ?? this.mobileMoneyAccountId,
       lightningPaymentId: lightningPaymentId ?? this.lightningPaymentId,
     );
@@ -193,7 +184,6 @@ class Transaction {
       'metadata': metadata,
       'walletId': walletId,
       'vaultId': vaultId,
-      'investmentId': investmentId,
       'mobileMoneyAccountId': mobileMoneyAccountId,
       'lightningPaymentId': lightningPaymentId,
     };
@@ -223,10 +213,7 @@ class Transaction {
       fromAccount: json['fromAccount'],
       toAccount: json['toAccount'],
       timestamp: DateTime.parse(json['timestamp']),
-      completedAt:
-          json['completedAt'] != null
-              ? DateTime.parse(json['completedAt'])
-              : null,
+      completedAt: json['completedAt'] != null ? DateTime.parse(json['completedAt']) : null,
       hash: json['hash'],
       txid: json['txid'],
       confirmed: json['confirmed'] ?? true,
@@ -234,13 +221,9 @@ class Transaction {
       description: json['description'],
       memo: json['memo'],
       reference: json['reference'],
-      metadata:
-          json['metadata'] != null
-              ? Map<String, dynamic>.from(json['metadata'])
-              : null,
+      metadata: json['metadata'],
       walletId: json['walletId'],
       vaultId: json['vaultId'],
-      investmentId: json['investmentId'],
       mobileMoneyAccountId: json['mobileMoneyAccountId'],
       lightningPaymentId: json['lightningPaymentId'],
     );
@@ -269,12 +252,6 @@ class Transaction {
         return 'Retrait coffre';
       case TransactionType.vaultInterest:
         return 'Intérêts coffre';
-      case TransactionType.investmentBuy:
-        return 'Achat investissement';
-      case TransactionType.investmentSell:
-        return 'Vente investissement';
-      case TransactionType.investmentDividend:
-        return 'Dividende';
       case TransactionType.internalTransfer:
         return 'Transfert interne';
       case TransactionType.networkFee:
@@ -355,7 +332,6 @@ class Transaction {
       TransactionType.lightningSent,
       TransactionType.mobileMoneyWithdraw,
       TransactionType.vaultDeposit,
-      TransactionType.investmentBuy,
       TransactionType.networkFee,
       TransactionType.serviceFee,
     ].contains(type);
@@ -368,8 +344,6 @@ class Transaction {
       TransactionType.mobileMoneyDeposit,
       TransactionType.vaultWithdraw,
       TransactionType.vaultInterest,
-      TransactionType.investmentSell,
-      TransactionType.investmentDividend,
       TransactionType.refund,
       TransactionType.bonus,
     ].contains(type);

@@ -1,8 +1,7 @@
 enum VaultType {
   savings,
   goal,
-  emergency,
-  investment
+  emergency
 }
 
 enum VaultStatus {
@@ -238,8 +237,6 @@ class Vault {
         return 'Objectif';
       case VaultType.emergency:
         return 'Urgence';
-      case VaultType.investment:
-        return 'Investissement';
     }
   }
 

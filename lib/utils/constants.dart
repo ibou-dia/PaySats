@@ -1,7 +1,7 @@
 class Constants {
   // App
   static const String appName = 'PaySats';
-  static const String appSlogan = 'Mobile Money + Bitcoin + Épargne + Investissement';
+  static const String appSlogan = 'Mobile Money + Bitcoin + Épargne';
   static const String appVersion = '1.0.0';
   
   // Routes - Principales
@@ -23,10 +23,7 @@ class Constants {
   static const String routeCreateVault = '/create-vault';
   static const String routeVaultDetails = '/vault-details';
   
-  // Routes - Investissements
-  static const String routeInvestments = '/investments';
-  static const String routeInvestmentDetails = '/investment-details';
-  static const String routePortfolio = '/portfolio';
+
   
   // Routes - Drawer
   static const String routeAccount = '/account';
@@ -77,11 +74,7 @@ class Constants {
   static const String vaultTypeProject = 'PROJECT';
   static const String vaultTypeMarriage = 'MARRIAGE';
   
-  // Investment Types
-  static const String investmentTypeStocks = 'STOCKS';
-  static const String investmentTypeBRVM = 'BRVM';
-  static const String investmentTypeCommunity = 'COMMUNITY';
-  static const String investmentTypeBonds = 'BONDS';
+
   
   // Transaction Types
   static const String transactionTypeSend = 'SEND';
@@ -90,7 +83,6 @@ class Constants {
   static const String transactionTypeWithdraw = 'WITHDRAW';
   static const String transactionTypeVaultDeposit = 'VAULT_DEPOSIT';
   static const String transactionTypeVaultWithdraw = 'VAULT_WITHDRAW';
-  static const String transactionTypeInvestment = 'INVESTMENT';
   
   // Limits (en FCFA)
   static const double dailyTransactionLimit = 500000; // 500,000 FCFA

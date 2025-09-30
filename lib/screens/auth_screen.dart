@@ -53,7 +53,7 @@ class AuthScreen extends StatelessWidget {
                     ),
                     const SizedBox(height: 8),
                     const Text(
-                      'Gérez vos paiements, épargne et investissements avec Bitcoin et Mobile Money',
+                      'Gérez vos paiements et épargne avec Bitcoin et Mobile Money',
                       textAlign: TextAlign.center,
                       style: TextStyle(
                         fontSize: 16,
