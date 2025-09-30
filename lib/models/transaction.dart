@@ -2,36 +2,36 @@ enum TransactionType {
   // Bitcoin transactions
   bitcoinSent,
   bitcoinReceived,
-  
+
   // Lightning Network transactions
   lightningSent,
   lightningReceived,
-  
+
   // Mobile Money transactions
   mobileMoneyDeposit,
   mobileMoneyWithdraw,
   mobileMoneyTransfer,
-  
+
   // Vault operations
   vaultDeposit,
   vaultWithdraw,
   vaultInterest,
-  
+
   // Investment operations
   investmentBuy,
   investmentSell,
   investmentDividend,
-  
+
   // Internal transfers
   internalTransfer,
-  
+
   // Fees and charges
   networkFee,
   serviceFee,
-  
+
   // Other
   refund,
-  bonus
+  bonus,
 }
 
 enum TransactionStatus {
@@ -40,17 +40,10 @@ enum TransactionStatus {
   completed,
   failed,
   cancelled,
-  expired
+  expired,
 }
 
-enum TransactionCategory {
-  payment,
-  transfer,
-  investment,
-  savings,
-  fee,
-  reward
-}
+enum TransactionCategory { payment, transfer, investment, savings, fee, reward }
 
 class Transaction {
   final String id;
@@ -75,7 +68,7 @@ class Transaction {
   final String? memo;
   final String? reference;
   final Map<String, dynamic>? metadata;
-  
+
   // Related entity IDs
   final String? walletId;
   final String? vaultId;
@@ -230,9 +223,10 @@ class Transaction {
       fromAccount: json['fromAccount'],
       toAccount: json['toAccount'],
       timestamp: DateTime.parse(json['timestamp']),
-      completedAt: json['completedAt'] != null 
-          ? DateTime.parse(json['completedAt']) 
-          : null,
+      completedAt:
+          json['completedAt'] != null
+              ? DateTime.parse(json['completedAt'])
+              : null,
       hash: json['hash'],
       txid: json['txid'],
       confirmed: json['confirmed'] ?? true,
@@ -240,9 +234,10 @@ class Transaction {
       description: json['description'],
       memo: json['memo'],
       reference: json['reference'],
-      metadata: json['metadata'] != null 
-          ? Map<String, dynamic>.from(json['metadata']) 
-          : null,
+      metadata:
+          json['metadata'] != null
+              ? Map<String, dynamic>.from(json['metadata'])
+              : null,
       walletId: json['walletId'],
       vaultId: json['vaultId'],
       investmentId: json['investmentId'],
@@ -314,15 +309,17 @@ class Transaction {
     final sign = isOutgoing ? '-' : '+';
     // Format amount with appropriate decimal places, removing trailing zeros
     String formattedValue;
-    
+
     // Check for invalid values
     if (amount.isNaN || amount.isInfinite) {
       return '${sign}0.00 $currency';
     }
-    
+
     if (currency == 'BTC' || currency == 'SATS') {
       // For Bitcoin/SATS, use formatBitcoin to remove trailing zeros
-      formattedValue = amount.toStringAsFixed(8).replaceAll(RegExp(r'([.]*0+)$'), '');
+      formattedValue = amount
+          .toStringAsFixed(8)
+          .replaceAll(RegExp(r'([.]*0+)$'), '');
     } else {
       // For fiat currencies, use 2 decimal places
       formattedValue = amount.toStringAsFixed(2);
@@ -332,17 +329,19 @@ class Transaction {
 
   String get formattedFees {
     if (fees == null) return '';
-    
+
     // Check for invalid values
     if (fees!.isNaN || fees!.isInfinite) {
       return '0.00 $currency';
     }
-    
+
     // Format fees with appropriate decimal places, removing trailing zeros
     String formattedValue;
     if (currency == 'BTC' || currency == 'SATS') {
       // For Bitcoin/SATS, remove trailing zeros
-      formattedValue = fees!.toStringAsFixed(8).replaceAll(RegExp(r'([.]*0+)$'), '');
+      formattedValue = fees!
+          .toStringAsFixed(8)
+          .replaceAll(RegExp(r'([.]*0+)$'), '');
     } else {
       // For fiat currencies, use 2 decimal places
       formattedValue = fees!.toStringAsFixed(2);
@@ -389,55 +388,12 @@ class Transaction {
         userId: 'user123',
         type: TransactionType.bitcoinReceived,
         category: TransactionCategory.payment,
-        amount: 0.0025,
+        amount: 1000.0, // 1000 sats
+        currency: 'SATS',
         toAddress: 'SP2JXKMSH007NPYAQHKJPQMAQYAD90NQGTVJVQ02B',
-        timestamp: now.subtract(const Duration(hours: 2)),
-        hash: '0x1234567890abcdef1234567890abcdef',
+        timestamp: now,
+        hash: '0x56767890ldsjfhg45689653afxcf',
         description: 'Paiement reçu',
-      ),
-      Transaction(
-        id: '2',
-        userId: 'user123',
-        type: TransactionType.bitcoinSent,
-        category: TransactionCategory.payment,
-        amount: 0.001,
-        fromAddress: 'SP1HTBVD3JG9C05J7HBJTHGR0GGW7KXW28M5JS8QE',
-        timestamp: now.subtract(const Duration(days: 1)),
-        hash: '0xabcdef1234567890abcdef1234567890',
-        fees: 0.00001,
-        description: 'Paiement envoyé',
-      ),
-      Transaction(
-        id: '3',
-        userId: 'user123',
-        type: TransactionType.vaultDeposit,
-        category: TransactionCategory.savings,
-        amount: 0.005,
-        timestamp: now.subtract(const Duration(days: 3)),
-        vaultId: 'vault1',
-        description: 'Dépôt dans le coffre épargne',
-      ),
-      Transaction(
-        id: '4',
-        userId: 'user123',
-        type: TransactionType.mobileMoneyDeposit,
-        category: TransactionCategory.transfer,
-        amount: 50000,
-        currency: 'XOF',
-        timestamp: now.subtract(const Duration(days: 5)),
-        mobileMoneyAccountId: 'wave1',
-        fromAccount: 'Wave - 77 123 45 67',
-        description: 'Dépôt depuis Wave',
-      ),
-      Transaction(
-        id: '5',
-        userId: 'user123',
-        type: TransactionType.lightningReceived,
-        category: TransactionCategory.payment,
-        amount: 0.0001,
-        timestamp: now.subtract(const Duration(hours: 6)),
-        lightningPaymentId: 'ln1',
-        description: 'Paiement Lightning reçu',
       ),
     ];
   }

@@ -8,6 +8,7 @@ import '../models/user.dart';
 import '../models/auth_state.dart';
 import '../models/seed_phrase.dart';
 import '../models/wallet.dart';
+import '../models/transaction.dart';
 
 class AuthService extends ChangeNotifier {
   static const String _authStateKey = 'auth_state';
@@ -70,6 +71,9 @@ class AuthService extends ChangeNotifier {
 
       _seedPhrase = seedPhrase;
       _wallet = wallet;
+
+      // Créer la transaction de bienvenue
+      await _createWelcomeTransaction(wallet);
 
       // Mettre à jour l'état d'authentification
       _authState = _authState.copyWith(
@@ -399,6 +403,54 @@ class AuthService extends ChangeNotifier {
     return base64Url.encode(bytes);
   }
 
+  /// Crée une transaction de bienvenue pour un nouveau wallet
+  Future<void> _createWelcomeTransaction(Wallet wallet) async {
+    try {
+      final prefs = await SharedPreferences.getInstance();
+      
+      // Vérifier si une transaction de bienvenue existe déjà pour ce wallet
+      final transactionsKey = 'transactions_${wallet.userId}';
+      final existingTransactionsJson = prefs.getString(transactionsKey) ?? '[]';
+      final existingTransactions = (jsonDecode(existingTransactionsJson) as List)
+          .map((t) => t as Map<String, dynamic>)
+          .toList();
+      
+      // Vérifier s'il y a déjà une transaction de bienvenue
+      final hasWelcomeTransaction = existingTransactions.any((t) => 
+          t['description'] == 'Bonus de bienvenue PaySats');
+      
+      if (hasWelcomeTransaction) {
+        debugPrint('Transaction de bienvenue déjà existante pour ce wallet');
+        return;
+      }
+      
+      // Créer la transaction de bienvenue
+      final welcomeTransaction = Transaction(
+        id: 'welcome_${wallet.userId}_${DateTime.now().millisecondsSinceEpoch}',
+        userId: wallet.userId,
+        type: TransactionType.bitcoinReceived,
+        status: TransactionStatus.completed,
+        category: TransactionCategory.payment,
+        amount: 1000.0, // 1000 sats
+        currency: 'SATS',
+        toAddress: wallet.address,
+        timestamp: DateTime.now(),
+        completedAt: DateTime.now(),
+        hash: '0x${DateTime.now().millisecondsSinceEpoch.toRadixString(16)}',
+        confirmations: 6,
+        description: 'Bonus de bienvenue PaySats',
+        confirmed: true,
+      );
+
+      // Sauvegarder la transaction dans SharedPreferences avec une clé spécifique au wallet
+      existingTransactions.insert(0, welcomeTransaction.toJson());
+      await prefs.setString(transactionsKey, jsonEncode(existingTransactions));
+      
+    } catch (e) {
+      debugPrint('Erreur lors de la création de la transaction de bienvenue: $e');
+    }
+  }
+
   String _hashPin(String pin) {
     final bytes = utf8.encode(pin + 'paysats_salt_2024');
     final digest = sha256.convert(bytes);
@@ -425,7 +477,7 @@ class AuthService extends ChangeNotifier {
       type: WalletType.bitcoin,
       address: address,
       publicKey: publicKey,
-      balance: 0.0,
+      balance: 1000.0, // Solde initial de 1000 sats
       currency: 'SATS',
       isActive: true,
       createdAt: DateTime.now(),

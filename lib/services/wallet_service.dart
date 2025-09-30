@@ -1,9 +1,11 @@
+import 'dart:convert';
 import 'package:flutter/foundation.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import '../models/wallet.dart';
 import '../models/transaction.dart';
 import '../utils/constants.dart';
 import 'currency_service.dart';
+import 'auth_service.dart';
 
 // Note: We removed flutter_secure_storage dependency due to Android SDK platform issues
 // and we're now using only shared_preferences for storage
@@ -55,7 +57,35 @@ class WalletService extends ChangeNotifier {
 
   // Load transaction history (currently using sample data)
   Future<void> _loadTransactions() async {
-    _transactions = Transaction.getSampleTransactions();
+    try {
+      final prefs = await SharedPreferences.getInstance();
+      
+      // Obtenir l'ID de l'utilisateur actuel depuis AuthService
+      final authService = AuthService();
+      final currentWallet = authService.wallet;
+      
+      if (currentWallet != null) {
+        // Charger les transactions spécifiques à ce wallet
+        final transactionsKey = 'transactions_${currentWallet.userId}';
+        final transactionsJson = prefs.getString(transactionsKey);
+        
+        if (transactionsJson != null) {
+          final transactionsList = (jsonDecode(transactionsJson) as List)
+              .map((t) => Transaction.fromJson(t as Map<String, dynamic>))
+              .toList();
+          _transactions = transactionsList;
+        } else {
+          // Si aucune transaction sauvegardée pour ce wallet, liste vide
+          _transactions = [];
+        }
+      } else {
+        // Si pas de wallet connecté, utiliser les données d'exemple
+        _transactions = Transaction.getSampleTransactions();
+      }
+    } catch (e) {
+      // En cas d'erreur, utiliser les données d'exemple
+      _transactions = Transaction.getSampleTransactions();
+    }
     notifyListeners();
   }
 
@@ -71,7 +101,7 @@ class WalletService extends ChangeNotifier {
       
       final prefs = await SharedPreferences.getInstance();
       await prefs.setString(Constants.keyWalletAddress, Constants.dummyWalletAddress);
-      await prefs.setDouble(Constants.keyWalletBalance, 1250000); // 0.0125 BTC = 1,250,000 sats
+      await prefs.setDouble(Constants.keyWalletBalance, 1000); // 1000 sats
       
       _wallet = Wallet(
         id: 'wallet_${DateTime.now().millisecondsSinceEpoch}',
@@ -79,7 +109,7 @@ class WalletService extends ChangeNotifier {
         name: 'Mon Wallet Bitcoin',
         type: WalletType.bitcoin,
         address: Constants.dummyWalletAddress,
-        balance: 1250000, // Balance en sats
+        balance: 1000, // Balance en sats
         currency: 'SATS',
         connected: true,
         createdAt: DateTime.now(),
@@ -165,8 +195,9 @@ class WalletService extends ChangeNotifier {
       final prefs = await SharedPreferences.getInstance();
       await prefs.setDouble(Constants.keyWalletBalance, newBalance);
       
-      // Add transaction to history
+      // Add transaction to history and save to SharedPreferences
       _transactions.insert(0, newTransaction);
+      await _saveTransactions();
       
       _setLoading(false);
       notifyListeners();
@@ -317,8 +348,9 @@ class WalletService extends ChangeNotifier {
       final prefs = await SharedPreferences.getInstance();
       await prefs.setDouble(Constants.keyWalletBalance, newBalance);
       
-      // Add transaction to history
+      // Add transaction to history and save to SharedPreferences
       _transactions.insert(0, newTransaction);
+      await _saveTransactions();
       
       _setLoading(false);
       notifyListeners();
@@ -326,6 +358,23 @@ class WalletService extends ChangeNotifier {
     } catch (e) {
       _setError('Erreur lors du dépôt: ${e.toString()}');
       return false;
+    }
+  }
+
+  // Sauvegarder les transactions dans SharedPreferences
+  Future<void> _saveTransactions() async {
+    try {
+      final prefs = await SharedPreferences.getInstance();
+      final authService = AuthService();
+      final currentWallet = authService.wallet;
+      
+      if (currentWallet != null) {
+        final transactionsKey = 'transactions_${currentWallet.userId}';
+        final transactionsJson = _transactions.map((t) => t.toJson()).toList();
+        await prefs.setString(transactionsKey, jsonEncode(transactionsJson));
+      }
+    } catch (e) {
+      debugPrint('Erreur lors de la sauvegarde des transactions: $e');
     }
   }
 
