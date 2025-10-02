@@ -82,8 +82,7 @@ flutter run
 ## Communication
 
 - Utilisez les issues GitHub pour les discussions techniques
-- Rejoignez notre [canal Telegram](https://t.me/paysats) pour les discussions générales
-- Pour les questions sensibles, contactez-nous à contact@paysats.com
+- Pour les questions sensibles, contactez-nous à ibrahimadia800@gmail.com
 
 ## Code de conduite
 
