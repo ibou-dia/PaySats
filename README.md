@@ -14,7 +14,7 @@ Rendre les paiements et l'épargne accessibles à tous au Sénégal et en Afriqu
 
 ### 💸 Paiements et Transferts
 
-- **Mobile Money intégré** : Connexion avec Wave, Orange Money, Free Money
+- **Mobile Money intégré** : Connexion avec Wave, Orange Money, Mixx by Yas
 - **Bitcoin Lightning** : Paiements rapides et peu coûteux via QR codes
 - **Envoi/Réception** : Transferts d'argent instantanés entre utilisateurs
 - **Conversion automatique** : Dépôt Mobile Money → Bitcoin (sats)
