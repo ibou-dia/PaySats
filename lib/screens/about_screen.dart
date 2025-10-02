@@ -23,7 +23,7 @@ class AboutScreen extends StatelessWidget {
               textAlign: TextAlign.center,
             ),
             const SizedBox(height: 32),
-            
+
             // App logo and name
             const BitcoinLogo(size: 80),
             const SizedBox(height: 24),
@@ -35,20 +35,20 @@ class AboutScreen extends StatelessWidget {
             const SizedBox(height: 8),
             Text(
               'Version 1.0.0',
-              style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-                    color: AppTheme.textSecondary,
-                  ),
+              style: Theme.of(
+                context,
+              ).textTheme.bodyMedium?.copyWith(color: AppTheme.textSecondary),
               textAlign: TextAlign.center,
             ),
             const SizedBox(height: 32),
-            
+
             // App description
             const Text(
               'PaySats est une application mobile de paiement et de gestion financière qui facilite les transactions et la gestion de vos finances.',
               textAlign: TextAlign.center,
             ),
             const SizedBox(height: 24),
-            
+
             Card(
               elevation: 2,
               shape: RoundedRectangleBorder(
@@ -62,7 +62,7 @@ class AboutScreen extends StatelessWidget {
                       context,
                       icon: Icons.code,
                       title: 'Dépôt GitHub',
-                      url: 'https://github.com/user/paysats',
+                      url: 'https://github.com/ibou-dia/paysats',
                     ),
                     const Divider(height: 24),
                     _buildLinkRow(
@@ -76,48 +76,49 @@ class AboutScreen extends StatelessWidget {
                       context,
                       icon: Icons.shield,
                       title: 'Politique de Confidentialité',
-                      url: 'https://example.com/privacy',
+                      url: 'https://paysats.com/privacy',
                     ),
                     const Divider(height: 24),
                     _buildLinkRow(
                       context,
                       icon: Icons.gavel,
                       title: 'Conditions d\'Utilisation',
-                      url: 'https://example.com/terms',
+                      url: 'https://paysats.com/terms',
                     ),
                   ],
                 ),
               ),
             ),
-            
+
             const SizedBox(height: 32),
-            
+
             // Info sections
             _buildInfoSection(
               context,
               title: 'Qu\'est-ce que PaySats ?',
-              content: 'PaySats est une application mobile innovante qui simplifie les paiements et la gestion financière. Elle offre une interface intuitive pour effectuer des transactions rapides et sécurisées.',
+              content:
+                  'PaySats est une application mobile innovante qui simplifie les paiements et la gestion financière. Elle offre une interface intuitive pour effectuer des transactions rapides et sécurisées.',
             ),
-            
+
             const SizedBox(height: 24),
-            
+
             _buildInfoSection(
               context,
               title: 'Comment ça fonctionne',
-              content: 'PaySats utilise des technologies modernes pour garantir la sécurité et la rapidité de vos transactions. L\'application vous permet de gérer facilement vos finances avec des fonctionnalités avancées de suivi et de contrôle.',
+              content:
+                  'PaySats utilise des technologies modernes pour garantir la sécurité et la rapidité de vos transactions. L\'application vous permet de gérer facilement vos finances avec des fonctionnalités avancées de suivi et de contrôle.',
             ),
-            
+
             const SizedBox(height: 40),
-            
+
             // Credits
             Text(
               '© 2025 Équipe PaySats',
-              style: Theme.of(context).textTheme.bodySmall?.copyWith(
-                    color: AppTheme.textSecondary,
-                  ),
+              style: Theme.of(
+                context,
+              ).textTheme.bodySmall?.copyWith(color: AppTheme.textSecondary),
               textAlign: TextAlign.center,
             ),
-            
           ],
         ),
       ),
@@ -143,26 +144,19 @@ class AboutScreen extends StatelessWidget {
                 color: AppTheme.bitcoinOrange.withOpacity(0.1),
                 borderRadius: BorderRadius.circular(12),
               ),
-              child: Icon(
-                icon,
-                color: AppTheme.bitcoinOrange,
-                size: 20,
-              ),
+              child: Icon(icon, color: AppTheme.bitcoinOrange, size: 20),
             ),
             const SizedBox(width: 16),
             Expanded(
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  Text(
-                    title,
-                    style: Theme.of(context).textTheme.titleMedium,
-                  ),
+                  Text(title, style: Theme.of(context).textTheme.titleMedium),
                   Text(
                     url,
                     style: Theme.of(context).textTheme.bodySmall?.copyWith(
-                          color: AppTheme.textSecondary,
-                        ),
+                      color: AppTheme.textSecondary,
+                    ),
                   ),
                 ],
               ),
@@ -182,15 +176,9 @@ class AboutScreen extends StatelessWidget {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        Text(
-          title,
-          style: Theme.of(context).textTheme.titleLarge,
-        ),
+        Text(title, style: Theme.of(context).textTheme.titleLarge),
         const SizedBox(height: 8),
-        Text(
-          content,
-          style: Theme.of(context).textTheme.bodyMedium,
-        ),
+        Text(content, style: Theme.of(context).textTheme.bodyMedium),
       ],
     );
   }
