@@ -120,7 +120,6 @@ Créez un fichier `.env` à la racine du projet :
 # APIs Mobile Money
 WAVE_API_KEY=votre_cle_wave
 ORANGE_MONEY_API_KEY=votre_cle_orange
-FREE_MONEY_API_KEY=votre_cle_free
 MIXX_API_KEY=votre_cle_mixx
 
 # Bitcoin Lightning
