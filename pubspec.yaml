@@ -36,7 +36,7 @@ dependencies:
   cupertino_icons: ^1.0.8
   
   # UI and styling
-  google_fonts: ^6.1.0
+  google_fonts: ^6.3.3
   flutter_svg: ^2.0.9
   
   # State management
